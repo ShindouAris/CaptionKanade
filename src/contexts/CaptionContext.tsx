@@ -1,19 +1,26 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Caption, CaptionFilter, User, UserQuota } from '../types/Caption';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { Caption } from '../types/Caption';
+const API_URL = import.meta.env.VITE_API_URL;
+type SortBy = 'newest' | 'oldest' | 'popular';
 
 interface CaptionContextType {
   captions: Caption[];
-  addCaption: (caption: Omit<Caption, 'id' | 'createdAt' | 'updatedAt'>) => void;
-  updateCaption: (id: string, updates: Partial<Caption>) => void;
-  deleteCaption: (id: string) => void;
-  toggleFavorite: (id: string) => void;
   filteredCaptions: Caption[];
-  filter: CaptionFilter;
-  setFilter: (filter: Partial<CaptionFilter>) => void;
+  filter: {
+    searchQuery: string;
+    tags: string[];
+    onlyFavorites: boolean;
+    sortBy: SortBy;
+  };
+  setFilter: (newFilter: Partial<CaptionContextType['filter']>) => void;
   availableTags: string[];
-  exportCaptions: () => string;
-  importCaptions: (data: string) => void;
-  user: User;
+  addCaption: (caption: Omit<Caption, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  deleteCaption: (id: string) => Promise<void>;
+  toggleFavorite: (id: string) => void;
+  user: {
+    isMember: boolean;
+    uploadQuota: number;
+  };
   updateUserQuota: () => void;
   canUploadIcon: () => boolean;
   getRemainingQuota: () => number;
@@ -29,208 +36,162 @@ export const useCaptions = () => {
   return context;
 };
 
-interface CaptionProviderProps {
-  children: ReactNode;
-}
-
-export const CaptionProvider: React.FC<CaptionProviderProps> = ({ children }) => {
+export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [captions, setCaptions] = useState<Caption[]>([]);
-  const [filter, setFilterState] = useState<CaptionFilter>({
-    tags: [],
+  const [icon_url, seticon_url] = useState<File | null>(null);
+  const [filter, setFilter] = useState<CaptionContextType['filter']>({
     searchQuery: '',
-    sortBy: 'newest',
-    onlyFavorites: false
+    tags: [],
+    onlyFavorites: false,
+    sortBy: 'newest'
   });
-
-  const [user, setUser] = useState<User>({
-    isMember: true, // Set to true for demo, in real app this would come from auth
-    quota: {
-      date: new Date().toDateString(),
-      uploadCount: 0,
-      maxUploads: 5
-    }
+  const [user, setUser] = useState({
+    isMember: false,
+    uploadQuota: 5
   });
-
-  // Load captions from localStorage on mount
+  // Fetch captions on mount
   useEffect(() => {
-    const savedCaptions = localStorage.getItem('captionkanade-captions');
-    if (savedCaptions) {
-      try {
-        const parsed = JSON.parse(savedCaptions);
-        setCaptions(parsed.map((caption: any) => ({
-          ...caption,
-          createdAt: new Date(caption.createdAt),
-          updatedAt: new Date(caption.updatedAt),
-          // Migrate old captions to new format
-          colortop: caption.colortop || '#FFDEE9',
-          colorbottom: caption.colorbottom || '#B5FFFC'
-        })));
-      } catch (error) {
-        console.error('Error loading captions:', error);
-      }
-    }
-
-    // Load user quota
-    const savedQuota = localStorage.getItem('captionkanade-quota');
-    if (savedQuota) {
-      try {
-        const quota = JSON.parse(savedQuota);
-        const today = new Date().toDateString();
-        
-        // Reset quota if it's a new day
-        if (quota.date !== today) {
-          quota.date = today;
-          quota.uploadCount = 0;
-        }
-        
-        setUser(prev => ({ ...prev, quota }));
-      } catch (error) {
-        console.error('Error loading quota:', error);
-      }
-    }
+    fetchCaptions();
   }, []);
 
-  // Save captions to localStorage whenever captions change
-  useEffect(() => {
-    localStorage.setItem('captionkanade-captions', JSON.stringify(captions));
-  }, [captions]);
-
-  // Save quota to localStorage whenever it changes
-  useEffect(() => {
-    localStorage.setItem('captionkanade-quota', JSON.stringify(user.quota));
-  }, [user.quota]);
-
-  const addCaption = (captionData: Omit<Caption, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newCaption: Caption = {
-      ...captionData,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    setCaptions(prev => [newCaption, ...prev]);
+  const fetchCaptions = async () => {
+    try {
+      const response = await fetch(`${API_URL}/captions`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setCaptions(data.map((caption: Caption) => ({
+          ...caption,
+          isFavorite: false
+        })));
+      }
+    } catch (error) {
+      console.error('Error fetching captions:', error);
+    }
   };
 
-  const updateCaption = (id: string, updates: Partial<Caption>) => {
-    setCaptions(prev => prev.map(caption => 
-      caption.id === id 
-        ? { ...caption, ...updates, updatedAt: new Date() }
-        : caption
-    ));
+  const addCaption = async (newCaption: Omit<Caption, 'id' | 'created_at' | 'updated_at'>) => {
+    try {
+      const formData = new FormData();
+      formData.append('text', newCaption.text);
+      formData.append('color', newCaption.color);
+      formData.append('colortop', newCaption.colortop);
+      formData.append('colorbottom', newCaption.colorbottom);
+      formData.append('author', newCaption.author);
+
+      if (newCaption.tags && newCaption.tags.length > 0) {
+        newCaption.tags.forEach(tag => formData.append('tags', tag));
+      }
+
+      if (newCaption.icon_url) {
+        formData.append('icon_url', newCaption.icon_url);
+      }
+
+      const response = await fetch(`${API_URL}/captions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        },
+        body: formData
+      });
+
+      if (response.ok) {
+        const savedCaption = await response.json();
+        setCaptions(prev => [...prev, { ...savedCaption, isFavorite: false }]);
+      }
+    } catch (error) {
+      console.error('Error adding caption:', error);
+      throw error;
+    }
   };
 
-  const deleteCaption = (id: string) => {
-    setCaptions(prev => prev.filter(caption => caption.id !== id));
+  const deleteCaption = async (id: string) => {
+    try {
+      const response = await fetch(`${API_URL}/captions/delete/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+        }
+      });
+
+      if (response.ok) {
+        setCaptions(prev => prev.filter(caption => caption.id !== id));
+      }
+    } catch (error) {
+      console.error('Error deleting caption:', error);
+      throw error;
+    }
   };
 
   const toggleFavorite = (id: string) => {
     setCaptions(prev => prev.map(caption => 
       caption.id === id 
-        ? { ...caption, isFavorite: !caption.isFavorite, updatedAt: new Date() }
+        ? { ...caption, isFavorite: !caption.isFavorite }
         : caption
     ));
   };
 
-  const setFilter = (newFilter: Partial<CaptionFilter>) => {
-    setFilterState(prev => ({ ...prev, ...newFilter }));
-  };
-
   const updateUserQuota = () => {
-    const today = new Date().toDateString();
     setUser(prev => ({
       ...prev,
-      quota: {
-        ...prev.quota,
-        date: today,
-        uploadCount: prev.quota.date === today ? prev.quota.uploadCount + 1 : 1
-      }
+      uploadQuota: Math.max(0, prev.uploadQuota - 1)
     }));
   };
 
   const canUploadIcon = () => {
-    return user.isMember && user.quota.uploadCount < user.quota.maxUploads;
+    return user.uploadQuota > 0;
   };
 
   const getRemainingQuota = () => {
-    return Math.max(0, user.quota.maxUploads - user.quota.uploadCount);
+    return user.uploadQuota;
   };
 
-  // Get filtered captions
-  const filteredCaptions = captions.filter(caption => {
-    // Search filter
-    if (filter.searchQuery && !caption.text.toLowerCase().includes(filter.searchQuery.toLowerCase())) {
-      return false;
-    }
-
-    // Tags filter
-    if (filter.tags.length > 0 && !filter.tags.some(tag => caption.tags.includes(tag))) {
-      return false;
-    }
-
-    // Favorites filter
-    if (filter.onlyFavorites && !caption.isFavorite) {
-      return false;
-    }
-
-    return true;
-  }).sort((a, b) => {
-    switch (filter.sortBy) {
-      case 'newest':
-        return b.createdAt.getTime() - a.createdAt.getTime();
-      case 'oldest':
-        return a.createdAt.getTime() - b.createdAt.getTime();
-      case 'popular':
-        return (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0);
-      default:
-        return 0;
-    }
-  });
-
-  // Get available tags
-  const availableTags = Array.from(new Set(captions.flatMap(caption => caption.tags)));
-
-  const exportCaptions = () => {
-    return JSON.stringify(captions, null, 2);
-  };
-
-  const importCaptions = (data: string) => {
-    try {
-      const imported = JSON.parse(data);
-      if (Array.isArray(imported)) {
-        const processedCaptions = imported.map((caption: any) => ({
-          ...caption,
-          id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-          createdAt: new Date(caption.createdAt || Date.now()),
-          updatedAt: new Date(caption.updatedAt || Date.now()),
-          // Ensure new format
-          colortop: caption.colortop || '#FFDEE9',
-          colorbottom: caption.colorbottom || '#B5FFFC'
-        }));
-        setCaptions(prev => [...processedCaptions, ...prev]);
+  // Filter and sort captions
+  const filteredCaptions = captions
+    .filter(caption => {
+      const matchesSearch = caption.text.toLowerCase().includes(filter.searchQuery.toLowerCase());
+      const matchesTags = filter.tags.length === 0 || (caption.tags && filter.tags.every(tag => caption.tags?.includes(tag)));
+      const matchesFavorite = !filter.onlyFavorites || caption.isFavorite;
+      return matchesSearch && matchesTags && matchesFavorite;
+    })
+    .sort((a, b) => {
+      switch (filter.sortBy) {
+        case 'newest':
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case 'oldest':
+          return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+        case 'popular':
+          return (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0);
+        default:
+          return 0;
       }
-    } catch (error) {
-      console.error('Error importing captions:', error);
-      throw new Error('Invalid caption data format');
-    }
+    });
+
+  // Get all unique tags
+  const availableTags = Array.from(
+    new Set(captions.flatMap(caption => caption.tags || []))
+  );
+
+  const value: CaptionContextType = {
+    captions,
+    filteredCaptions,
+    filter,
+    setFilter: (newFilter) => setFilter(prev => ({ ...prev, ...newFilter })),
+    availableTags,
+    addCaption,
+    deleteCaption,
+    toggleFavorite,
+    user,
+    updateUserQuota,
+    canUploadIcon,
+    getRemainingQuota
   };
 
   return (
-    <CaptionContext.Provider value={{
-      captions,
-      addCaption,
-      updateCaption,
-      deleteCaption,
-      toggleFavorite,
-      filteredCaptions,
-      filter,
-      setFilter,
-      availableTags,
-      exportCaptions,
-      importCaptions,
-      user,
-      updateUserQuota,
-      canUploadIcon,
-      getRemainingQuota
-    }}>
+    <CaptionContext.Provider value={value}>
       {children}
     </CaptionContext.Provider>
   );

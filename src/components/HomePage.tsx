@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, Sparkles, Heart, Smile, Coffee, Star } from 'lucide-react';
 import { useCaptions } from '../contexts/CaptionContext';
+import { useNavigate } from 'react-router-dom';
 
-interface HomePageProps {
-  onNavigate: (page: 'home' | 'builder' | 'library' | 'export') => void;
-}
-
-const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
+const HomePage: React.FC = () => {
   const { captions } = useCaptions();
   const [currentSampleIndex, setCurrentSampleIndex] = useState(0);
+  const navigate = useNavigate();
 
   const sampleCaptions = [
     { text: "Tình yêu đến từ cái nhìn đầu tiên 💘", icon: Heart },
@@ -45,14 +43,14 @@ const HomePage: React.FC<HomePageProps> = ({ onNavigate }) => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
-                onClick={() => onNavigate('builder')}
+                onClick={() => navigate('/builder')}
                 className="group bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-xl flex items-center justify-center gap-2"
               >
                 Bắt đầu ngay
                 <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </button>
               <button
-                onClick={() => onNavigate('library')}
+                onClick={() => navigate('/library')}
                 className="group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-pink-200 dark:border-gray-600 text-gray-800 dark:text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-300 hover:bg-white dark:hover:bg-gray-700 hover:shadow-lg"
               >
                 Xem thư viện ({captions.length})

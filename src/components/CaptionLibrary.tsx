@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Search, Filter, Heart, Edit3, Trash2, Download, Tag, Calendar } from 'lucide-react';
 import { useCaptions } from '../contexts/CaptionContext';
 
+
 const CaptionLibrary: React.FC = () => {
   const { 
     filteredCaptions, 
@@ -174,15 +175,14 @@ const CaptionLibrary: React.FC = () => {
                     style={{
                       background: `linear-gradient(to bottom, ${caption.colortop}, ${caption.colorbottom})`,
                       color: caption.color,
-                      fontFamily: caption.font,
                       fontSize: '14px',
                       fontWeight: 'bold',
                       border: '2px solid rgba(255,255,255,0.3)'
                     }}
                   >
-                    {caption.iconUrl && (
+                    {caption.icon_url && (
                       <img 
-                        src={caption.iconUrl} 
+                        src={caption.icon_url} 
                         alt="Icon" 
                         className="w-6 h-6 rounded-full object-cover flex-shrink-0" 
                       />
@@ -217,7 +217,7 @@ const CaptionLibrary: React.FC = () => {
                 </div>
 
                 {/* Tags */}
-                {caption.tags.length > 0 && (
+                {caption.tags && caption.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-3">
                     {caption.tags.map(tag => (
                       <span
@@ -234,7 +234,7 @@ const CaptionLibrary: React.FC = () => {
                 {/* Meta info */}
                 <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-4">
                   <Calendar size={12} />
-                  {caption.createdAt.toLocaleDateString('vi-VN')}
+                  {new Date(caption.created_at).toLocaleDateString('vi-VN')}
                 </div>
 
                 {/* Actions */}

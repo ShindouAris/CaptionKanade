@@ -1,15 +1,27 @@
 export interface Caption {
   id: string;
+  author: string;
   text: string;
-  tags: string[];
-  font: string;
+  type: 'background' | 'image_icon' | 'image_gif';
+  icon_url?: string;
+  icon_delete_link?: string;
+  tags: string[] | null;
   color: string;
   colortop: string;
   colorbottom: string;
-  iconUrl?: string;
-  createdAt: Date;
-  updatedAt: Date;
-  isFavorite?: boolean;
+  created_at: string;
+  updated_at: string;
+  isFavorite?: boolean; // Frontend only
+}
+
+export interface CaptionCreateForm {
+  author: string;
+  text: string;
+  icon_url?: File;
+  tags: string[] | null;
+  color: string;
+  colortop: string;
+  colorbottom: string;
 }
 
 export interface CaptionStyle {

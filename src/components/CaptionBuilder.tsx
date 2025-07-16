@@ -1,25 +1,23 @@
 import React, { useState, useRef } from 'react';
-import { Upload, Type, Palette, Hash, Save, Eye, EyeOff, Download, X, Image, Crown } from 'lucide-react';
+import { Upload, Type, Palette, Hash, Save, Eye, EyeOff, X, Image, Crown } from 'lucide-react';
 import { useCaptions } from '../contexts/CaptionContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const CaptionBuilder: React.FC = () => {
-  const { addCaption, user, updateUserQuota, canUploadIcon, getRemainingQuota } = useCaptions();
+  const { addCaption, user: captionUser, updateUserQuota, canUploadIcon, getRemainingQuota } = useCaptions();
+  const { user } = useAuth();
   const [captionText, setCaptionText] = useState('');
-  const [selectedFont, setSelectedFont] = useState('Inter');
   const [selectedColor, setSelectedColor] = useState('#ffffff');
   const [selectedColorTop, setSelectedColorTop] = useState('#FFDEE9');
   const [selectedColorBottom, setSelectedColorBottom] = useState('#B5FFFC');
-  const [iconUrl, setIconUrl] = useState<string>('');
+  const [iconFile, setIconFile] = useState<File | null>(null);
+  const [iconPreview, setIconPreview] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [showPreview, setShowPreview] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  const fonts = [
-    'Inter', 'Playfair Display', 'Poppins', 'Roboto', 'Pacifico', 'Dancing Script', 'Nunito'
-  ];
 
   const gradientPresets = [
     { top: '#FFDEE9', bottom: '#B5FFFC', name: 'Pastel Dream' },
@@ -54,9 +52,12 @@ const CaptionBuilder: React.FC = () => {
     }
 
     setIsUploading(true);
+    
+    // Create preview URL
     const reader = new FileReader();
     reader.onload = (e) => {
-      setIconUrl(e.target?.result as string);
+      setIconPreview(e.target?.result as string);
+      setIconFile(file);
       updateUserQuota();
       setIsUploading(false);
     };
@@ -75,13 +76,14 @@ const CaptionBuilder: React.FC = () => {
   };
 
   const handleSaveCaption = () => {
-    if (!captionText.trim()) return;
+    if (!user) return;
 
     addCaption({
-      text: captionText,
-      tags,
-      iconUrl: iconUrl || undefined,
-      font: selectedFont,
+      text: captionText.trim() || 'Caption Kanade', // Use default if empty
+      tags: tags.length > 0 ? tags : null,
+      author: user.id,
+      type: iconFile ? 'image_icon' : 'background',
+      icon_url: iconFile ? URL.createObjectURL(iconFile) : undefined,
       color: selectedColor,
       colortop: selectedColorTop,
       colorbottom: selectedColorBottom,
@@ -91,8 +93,8 @@ const CaptionBuilder: React.FC = () => {
     // Reset form
     setCaptionText('');
     setTags([]);
-    setIconUrl('');
-    setSelectedFont('Inter');
+    setIconFile(null);
+    setIconPreview('');
     setSelectedColor('#ffffff');
     setSelectedColorTop('#FFDEE9');
     setSelectedColorBottom('#B5FFFC');
@@ -101,53 +103,6 @@ const CaptionBuilder: React.FC = () => {
     // Show success message
     const event = new CustomEvent('caption-saved');
     window.dispatchEvent(event);
-  };
-
-  const downloadAsImage = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    canvas.width = 800;
-    canvas.height = 400;
-
-    // Create gradient background
-    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    gradient.addColorStop(0, selectedColorTop);
-    gradient.addColorStop(1, selectedColorBottom);
-    
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Draw caption bubble
-    const bubbleX = canvas.width / 2;
-    const bubbleY = canvas.height / 2;
-    const bubbleWidth = Math.min(600, canvas.width - 100);
-    const bubbleHeight = 120;
-
-    // Bubble gradient
-    const bubbleGradient = ctx.createLinearGradient(0, bubbleY - bubbleHeight/2, 0, bubbleY + bubbleHeight/2);
-    bubbleGradient.addColorStop(0, selectedColorTop);
-    bubbleGradient.addColorStop(1, selectedColorBottom);
-
-    ctx.fillStyle = bubbleGradient;
-    ctx.roundRect(bubbleX - bubbleWidth/2, bubbleY - bubbleHeight/2, bubbleWidth, bubbleHeight, 16);
-    ctx.fill();
-
-    // Draw text
-    ctx.font = `bold 32px ${selectedFont}`;
-    ctx.fillStyle = selectedColor;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(captionText, bubbleX, bubbleY);
-
-    // Download
-    const link = document.createElement('a');
-    link.download = `caption-${Date.now()}.png`;
-    link.href = canvas.toDataURL();
-    link.click();
   };
 
   return (
@@ -175,13 +130,13 @@ const CaptionBuilder: React.FC = () => {
             <textarea
               value={captionText}
               onChange={(e) => setCaptionText(e.target.value)}
-              placeholder="Nhập caption của bạn..."
+              placeholder="Caption Kanade"
               className="w-full h-32 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent resize-none bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             />
           </div>
 
           {/* Icon Upload - Only for Members */}
-          {user.isMember && (
+          {captionUser.isMember && (
             <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-pink-200 dark:border-gray-600">
               <div className="flex items-center gap-2 mb-4">
                 <Image className="text-pink-600 dark:text-pink-400" size={20} />
@@ -215,11 +170,14 @@ const CaptionBuilder: React.FC = () => {
                   className="hidden"
                 />
 
-                {iconUrl && (
+                {iconPreview && (
                   <div className="flex items-center gap-2">
-                    <img src={iconUrl} alt="Icon" className="w-8 h-8 rounded-full object-cover" />
+                    <img src={iconPreview} alt="Icon" className="w-8 h-8 rounded-full object-cover" />
                     <button
-                      onClick={() => setIconUrl('')}
+                      onClick={() => {
+                        setIconFile(null);
+                        setIconPreview('');
+                      }}
                       className="text-red-500 hover:text-red-700"
                     >
                       <X size={16} />
@@ -236,7 +194,7 @@ const CaptionBuilder: React.FC = () => {
           )}
 
           {/* Non-member notice */}
-          {!user.isMember && (
+          {!captionUser.isMember && (
             <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-2xl p-6 border border-yellow-200 dark:border-yellow-700">
               <div className="flex items-center gap-2 mb-2">
                 <Crown className="text-yellow-500" size={20} />
@@ -263,23 +221,6 @@ const CaptionBuilder: React.FC = () => {
             </div>
             
             <div className="space-y-4">
-              {/* Font Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Font chữ
-                </label>
-                <select
-                  value={selectedFont}
-                  onChange={(e) => setSelectedFont(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  {fonts.map(font => (
-                    <option key={font} value={font} style={{ fontFamily: font }}>
-                      {font}
-                    </option>
-                  ))}
-                </select>
-              </div>
 
               {/* Text Color */}
               <div>
@@ -358,7 +299,7 @@ const CaptionBuilder: React.FC = () => {
               <input
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
                 placeholder="Thêm tag..."
                 className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               />
@@ -416,30 +357,29 @@ const CaptionBuilder: React.FC = () => {
                   }}
                 />
                 
-                {captionText && (
-                  <div className="absolute inset-0 flex items-center justify-center p-4">
-                    <div
-                      className="flex items-center gap-4 px-6 py-4 rounded-2xl max-w-sm"
-                      style={{
-                        background: `linear-gradient(to bottom, ${selectedColorTop}, ${selectedColorBottom})`,
-                        color: selectedColor,
-                        fontFamily: selectedFont,
-                        fontSize: '16px',
-                        fontWeight: 'bold',
-                        border: '2px solid rgba(255,255,255,0.3)'
-                      }}
-                    >
-                      {iconUrl && (
-                        <img 
-                          src={iconUrl} 
-                          alt="Icon" 
-                          className="w-8 h-8 rounded-full object-cover flex-shrink-0" 
-                        />
-                      )}
-                      <span className="text-center">{captionText}</span>
-                    </div>
+                <div className="absolute inset-0 flex items-center justify-center p-4">
+                  <div
+                    className="flex items-center gap-4 px-6 py-4 rounded-2xl max-w-sm"
+                    style={{
+                      background: `linear-gradient(to bottom, ${selectedColorTop}, ${selectedColorBottom})`,
+                      color: selectedColor,
+                      fontSize: '16px',
+                      fontWeight: 'bold',
+                      border: '2px solid rgba(255,255,255,0.3)'
+                    }}
+                  >
+                    {iconPreview && (
+                      <img 
+                        src={iconPreview} 
+                        alt="Icon" 
+                        className="w-8 h-8 rounded-full object-cover flex-shrink-0" 
+                      />
+                    )}
+                    <span className="text-center">
+                      {captionText || 'Caption Kanade'}
+                    </span>
                   </div>
-                )}
+                </div>
               </div>
             )}
           </div>
@@ -448,20 +388,11 @@ const CaptionBuilder: React.FC = () => {
           <div className="flex gap-4">
             <button
               onClick={handleSaveCaption}
-              disabled={!captionText.trim()}
+              // disabled={!captionText.trim()}
               className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-semibold hover:from-pink-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Save size={20} />
               Lưu Caption
-            </button>
-            
-            <button
-              onClick={downloadAsImage}
-              disabled={!captionText.trim()}
-              className="flex items-center justify-center gap-2 px-6 py-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-xl font-semibold hover:bg-gray-50 dark:hover:bg-gray-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Download size={20} />
-              Tải xuống
             </button>
           </div>
         </div>

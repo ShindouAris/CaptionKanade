@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+  import React, { useState, useRef } from 'react';
 import { Download, Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react';
 import { useCaptions } from '../contexts/CaptionContext';
 
