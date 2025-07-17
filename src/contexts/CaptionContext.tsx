@@ -1,9 +1,28 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Caption } from '../types/Caption';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 const API_URL = import.meta.env.VITE_API_URL;
 type SortBy = 'newest' | 'oldest' | 'popular';
+
+// Debounce utility
+const debounce = <T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void => {
+  let timeout: number | undefined = undefined;
+  
+  return (...args: Parameters<T>) => {
+    if (timeout) {
+      window.clearTimeout(timeout);
+    }
+    
+    timeout = window.setTimeout(() => {
+      func(...args);
+      timeout = undefined;
+    }, wait);
+  };
+};
 
 interface PaginatedResponse {
   total: number;
@@ -159,9 +178,10 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  const toggleFavorite = async (id: string) => {
+  const toggleFavorite = useCallback(async (id: string) => {
     try {
       const isFavorited = captions.find(caption => caption.id === id)?.is_favorite || false;
+      setCaptions(prev => prev.map(caption => caption.id === id ? { ...caption, is_favorite: !isFavorited } : caption));
       const endpoint = isFavorited ? '/v1/member/unfavorite-post' : '/v1/member/add-favorite-post';
       const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
@@ -175,13 +195,25 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
         })
       });
 
-      if (response.ok) {
+      if (!response.ok) {
         setCaptions(prev => prev.map(caption => caption.id === id ? { ...caption, is_favorite: !isFavorited } : caption));
-      }
+      } 
     } catch (error) {
       console.error('Error toggling saved status:', error);
     }
-  };
+  }, [captions, authUser]);
+
+  // Debounced version of toggleFavorite that returns a Promise
+  const debouncedToggleFavorite = useCallback(
+    (id: string): Promise<void> => {
+      return new Promise((resolve) => {
+        debounce((id: string) => {
+          toggleFavorite(id).then(resolve);
+        }, 500)(id);
+      });
+    },
+    [toggleFavorite]
+  );
 
   const updateUserQuota = () => {
     setUser(prev => ({
@@ -241,7 +273,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     availableTags,
     addCaption,
     deleteCaption,
-    toggleFavorite,
+    toggleFavorite: debouncedToggleFavorite,
     fetchCaptions,
     user,
     updateUserQuota,
