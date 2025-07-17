@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Caption } from '../types/Caption';
+import { useLocation } from 'react-router-dom';
+import { useAuth } from './AuthContext';
 const API_URL = import.meta.env.VITE_API_URL;
 type SortBy = 'newest' | 'oldest' | 'popular';
 
@@ -51,7 +53,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [captions, setCaptions] = useState<Caption[]>([]);
   const [totalCaptions, setTotalCaptions] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(9);
   const [filter, setFilter] = useState<CaptionContextType['filter']>({
     searchQuery: '',
     tags: [],
@@ -63,10 +65,15 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     uploadQuota: 5
   });
 
-  // Fetch captions on mount
+  const location = useLocation();
+  const { user: authUser } = useAuth();
+
+  // Fetch captions only when on library page and user is logged in
   useEffect(() => {
-    fetchCaptions(1);
-  }, []);
+    if (location.pathname === '/library' && authUser) {
+      fetchCaptions(1);
+    }
+  }, [location.pathname, authUser]);
 
   const fetchCaptions = async (page: number) => {
     try {

@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Filter, Heart, Edit3, Trash2, Download, Tag, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Filter, Heart, Trash2, Tag, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import { FaHeart } from "react-icons/fa";
 import { useCaptions } from '../contexts/CaptionContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const CaptionLibrary: React.FC = () => {
   const { 
@@ -15,9 +17,8 @@ const CaptionLibrary: React.FC = () => {
     deleteCaption,
     fetchCaptions
   } = useCaptions();
-  
+  const { user } = useAuth();
   const [showFilters, setShowFilters] = useState(false);
-  const [selectedCaption, setSelectedCaption] = useState<string | null>(null);
 
   // Tính toán tổng số trang
   const totalPages = Math.ceil(totalCaptions / pageSize);
@@ -213,20 +214,6 @@ const CaptionLibrary: React.FC = () => {
                       </span>
                     </div>
                   </div>
-
-                  {/* Overlay actions */}
-                  <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => toggleFavorite(caption.id)}
-                      className={`p-2 rounded-full backdrop-blur-sm transition-colors ${
-                        caption.isFavorite
-                          ? 'bg-pink-500 text-white'
-                          : 'bg-white/80 text-gray-700 hover:bg-pink-500 hover:text-white'
-                      }`}
-                    >
-                      <Heart size={16} />
-                    </button>
-                  </div>
                 </div>
 
                 {/* Caption Details */}
@@ -260,25 +247,27 @@ const CaptionLibrary: React.FC = () => {
 
                   {/* Actions */}
                   <div className="flex gap-2">
+                                      
                     <button
-                      onClick={() => copyToClipboard(caption.text)}
-                      className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors text-sm"
+                      onClick={() => toggleFavorite(caption.id)}
+                      className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-colors ${
+                        caption.isFavorite
+                          ? 'bg-pink-200 text-white'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
                     >
-                      <Download size={14} />
-                      Copy
-                    </button>
-                    <button
-                      onClick={() => setSelectedCaption(caption.id === selectedCaption ? null : caption.id)}
-                      className="flex items-center justify-center px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                    >
-                      <Edit3 size={14} />
-                    </button>
+                      {caption.isFavorite ? <FaHeart size={14} /> : <Heart size={14} />}
+                      {caption.isFavorite ? 'Bỏ yêu thích' : 'Yêu thích'}
+                    </button>                    
+
+                    {(caption.author === user?.id) && (
                     <button
                       onClick={() => handleDelete(caption.id)}
                       className="flex items-center justify-center px-3 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
                     >
                       <Trash2 size={14} />
                     </button>
+                    )}
                   </div>
                 </div>
               </div>

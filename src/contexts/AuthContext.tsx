@@ -17,6 +17,8 @@ interface AuthContextType {
   logout: () => void;
   getAuthHeader: () => { Authorization: string } | {};
   token: string | null;
+  verifyAccount: (token: string) => Promise<void>;
+  submitOtp: (token: string, otp: number) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -58,22 +60,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (timeUntilRefresh > 0) {
       const timerId = window.setTimeout(async () => {
         try {
+          if (!token || !user?.id) {
+            console.error('No token or user ID found');
+            logout();
+            return;
+          }
+
           const response = await fetch(`${API_URL}/v1/user/refresh_token`, {
             method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
+            body: JSON.stringify({
+              token: token,
+              account_id: user?.id
+            })
           });
 
           if (response.ok) {
             const data = await response.json();
-            setToken(data.data.token);
-            localStorage.setItem('auth_token', data.data.token);
-            setupTokenRefresh(data.data.token);
+            setToken(data.token);
+            localStorage.setItem('auth_token', data.token);
+            setupTokenRefresh(data.token);
           } else {
+            console.error(`Failed to refresh token: ${response.statusText} - ${response.status}`);
             logout();
           }
         } catch {
+          console.error('Failed to refresh token');
           logout();
         }
       }, timeUntilRefresh);
@@ -122,11 +133,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || 'Login failed');
+        if (data.error === "wrong_email_or_password") {
+          throw new Error('Email hoặc mật khẩu không chính xác');
+        }
+        throw new Error(data.detail || 'Đăng nhập thất bại');
       }
 
       if (!data.data.token) {
-        throw new Error('No token received from server');
+        throw new Error('Không nhận được token từ server');
       }
 
       // Store token first
@@ -136,13 +150,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const [header, payload, signature] = data.data.token.split('.');
         if (!payload) {
-          throw new Error('Invalid token format');
+          throw new Error('Định dạng token không hợp lệ');
         }
 
         const decodedPayload = JSON.parse(atob(payload));
         
         if (!decodedPayload.id || !decodedPayload.email) {
-          throw new Error('Token payload missing required fields');
+          throw new Error('Token payload thiếu các trường bắt buộc');
         }
 
         setUser({
@@ -157,7 +171,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // If token parsing fails, clean up and throw error
         setToken(null);
         localStorage.removeItem('auth_token');
-        throw new Error(`Token parsing failed: ${tokenError.message}`);
+        throw new Error(`Lỗi phân tích token: ${tokenError.message}`);
       }
     } catch (error) {
       throw error;
@@ -178,7 +192,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       if (!response.ok) {
-        throw new Error('Registration failed');
+        throw new Error('Đăng ký thất bại');
       }
 
       await login(email, password);
@@ -217,7 +231,49 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     register,
     logout,
     getAuthHeader,
-    token
+    token,
+    verifyAccount: async (token: string) => {
+      setLoading(true);
+      try {
+        const response = await fetch(`${API_URL}/v1/user/verify_account`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ token })
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.detail || 'Failed to request verification');
+        }
+      } catch (error) {
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+    submitOtp: async (token: string, otp: number) => {
+      setLoading(true);
+      try {
+        const response = await fetch(`${API_URL}/v1/user/submit_otp`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ token, otp })
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.detail || 'Lỗi xác thực OTP');
+        }
+      } catch (error) {
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   return (
