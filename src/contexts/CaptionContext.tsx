@@ -37,6 +37,8 @@ interface CaptionContextType {
   totalCaptions: number;
   currentPage: number;
   pageSize: number;
+  isLoading: boolean;
+  error: string | null;
   filter: {
     searchQuery: string;
     tags: string[];
@@ -56,6 +58,8 @@ interface CaptionContextType {
   updateUserQuota: () => void;
   canUploadIcon: () => boolean;
   getRemainingQuota: () => number;
+  searchCaptions: (query: string, page: number) => Promise<void>;
+  clearSearch: () => void;
 }
 
 const CaptionContext = createContext<CaptionContextType | undefined>(undefined);
@@ -70,9 +74,13 @@ export const useCaptions = () => {
 
 export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [captions, setCaptions] = useState<Caption[]>([]);
+  const [cachedCaptions, setCachedCaptions] = useState<Caption[]>([]);
+  const [cachedTotal, setCachedTotal] = useState(0);
   const [totalCaptions, setTotalCaptions] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(9);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<CaptionContextType['filter']>({
     searchQuery: '',
     tags: [],
@@ -95,6 +103,8 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, [location.pathname, authUser]);
 
   const fetchCaptions = async (page: number) => {
+    setIsLoading(true);
+    setError(null);
     try {
       const response = await fetch(`${API_URL}/captions/${page}`, {
         headers: {
@@ -103,15 +113,24 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       });
       if (response.ok) {
         const data: PaginatedResponse = await response.json();
-        setCaptions(data.captions.map(caption => ({
+        const newCaptions = data.captions.map(caption => ({
           ...caption,
-        })));
+        }));
+        setCaptions(newCaptions);
+        // Cache kết quả fetch
+        setCachedCaptions(newCaptions);
         setTotalCaptions(data.total);
+        setCachedTotal(data.total);
         setCurrentPage(data.page);
         setPageSize(data.page_size);
+      } else {
+        throw new Error('Failed to fetch captions');
       }
     } catch (error) {
       console.error('Error fetching captions:', error);
+      setError(error instanceof Error ? error.message : 'An error occurred while fetching captions');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -230,6 +249,87 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return user.uploadQuota;
   };
 
+  let AbortController: AbortController | null = null;
+
+  const searchCaptions = async (query: string, page: number) => {
+    // Nếu query trống, sử dụng cache thay vì gọi API
+    if (!query.trim()) {
+      setCaptions(cachedCaptions);
+      setTotalCaptions(cachedTotal);
+      setCurrentPage(1);
+      setFilter(prev => ({ ...prev, searchQuery: '' }));
+      return;
+    }
+
+    // Nếu đang ở trang 1 và có chính xác 1 kết quả match hoàn toàn với query
+    // hoặc query mới chứa query cũ (đã match), không cần search nữa
+    if (page === 1 && captions.length === 1) {
+      const currentText = captions[0].text.toLowerCase();
+      const newQuery = query.toLowerCase();
+      // Nếu query mới chứa query cũ và query cũ đã match
+      if (currentText === filter.searchQuery.toLowerCase() && newQuery.includes(filter.searchQuery.toLowerCase())) {
+        return;
+      }
+      // Hoặc nếu query mới match hoàn toàn
+      if (currentText === newQuery) {
+        return;
+      }
+    }
+
+    // Nếu đã search trước đó không có kết quả và query mới chứa query cũ, không cần search nữa
+    if (page === 1 && totalCaptions === 0 && filter.searchQuery && query.toLowerCase().includes(filter.searchQuery.toLowerCase())) {
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    try {
+      if (AbortController) {
+        AbortController.abort();
+      }
+      AbortController = new window.AbortController();
+
+      const response = await fetch(`${API_URL}/captions/search/${page}`, {
+        method: 'POST',
+        headers: {
+        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        query: query
+      }),
+      signal: AbortController.signal
+      });
+      if (response.ok) {
+        const data: PaginatedResponse = await response.json();
+        setCaptions(data.captions.map(caption => ({
+          ...caption,
+        })));
+        setTotalCaptions(data.total);
+        setCurrentPage(data.page);
+        setPageSize(data.page_size);
+      } else {
+        throw new Error('Failed to search captions');
+      }
+    } catch (error) {
+      // Bỏ qua lỗi nếu request bị abort
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
+      console.error('Error searching captions:', error);
+      setError(error instanceof Error ? error.message : 'An error occurred while searching captions');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const clearSearch = () => {
+    setCaptions(cachedCaptions);
+    setTotalCaptions(cachedTotal);
+    setCurrentPage(1);
+    setFilter(prev => ({ ...prev, searchQuery: '' }));
+  };
+
   // Filter and sort captions - now only filter the current page
   const filteredCaptions = captions
     .filter(caption => {
@@ -256,33 +356,36 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     new Set(captions.flatMap(caption => caption.tags || []))
   );
 
-  const value: CaptionContextType = {
-    captions,
-    filteredCaptions,
-    totalCaptions,
-    currentPage,
-    pageSize,
-    filter,
-    setFilter: (newFilter) => {
-      // Sync onlySaved with onlyFavorites for backend compatibility
-      if ('onlyFavorites' in newFilter) {
-        newFilter.onlyFavorites = newFilter.onlyFavorites;
-      }
-      setFilter(prev => ({ ...prev, ...newFilter }));
-    },
-    availableTags,
-    addCaption,
-    deleteCaption,
-    toggleFavorite: debouncedToggleFavorite,
-    fetchCaptions,
-    user,
-    updateUserQuota,
-    canUploadIcon,
-    getRemainingQuota
+  const handleFilterUpdate = (newFilter: Partial<CaptionContextType['filter']>) => {
+    setFilter(prev => ({
+      ...prev,
+      ...newFilter
+    }));
   };
 
   return (
-    <CaptionContext.Provider value={value}>
+    <CaptionContext.Provider value={{
+      captions,
+      filteredCaptions,
+      totalCaptions,
+      currentPage,
+      pageSize,
+      isLoading,
+      error,
+      filter,
+      setFilter: handleFilterUpdate,
+      availableTags: Array.from(new Set(captions.flatMap(c => c.tags || []))),
+      addCaption,
+      deleteCaption,
+      toggleFavorite: debouncedToggleFavorite,
+      fetchCaptions,
+      user,
+      updateUserQuota,
+      canUploadIcon,
+      getRemainingQuota,
+      searchCaptions,
+      clearSearch
+    }}>
       {children}
     </CaptionContext.Provider>
   );

@@ -1,8 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Search, Filter, Heart, Trash2, Tag, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import { FaHeart } from "react-icons/fa";
 import { useCaptions } from '../contexts/CaptionContext';
 import { useAuth } from '../contexts/AuthContext';
+
+// Debounce utility
+const debounce = <T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void => {
+  let timeout: number | undefined = undefined;
+  
+  return (...args: Parameters<T>) => {
+    if (timeout) {
+      window.clearTimeout(timeout);
+    }
+    
+    timeout = window.setTimeout(() => {
+      func(...args);
+      timeout = undefined;
+    }, wait);
+  };
+};
 
 const CaptionLibrary: React.FC = () => {
   const { 
@@ -10,27 +29,50 @@ const CaptionLibrary: React.FC = () => {
     totalCaptions,
     currentPage,
     pageSize,
+    isLoading,
+    error,
     filter, 
     setFilter, 
     availableTags, 
     toggleFavorite, 
     deleteCaption,
     fetchCaptions,
+    searchCaptions,
+    clearSearch,
   } = useCaptions();
   const { user } = useAuth();
   const [showFilters, setShowFilters] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
 
   // Tính toán tổng số trang
   const totalPages = Math.ceil(totalCaptions / pageSize);
 
   // Xử lý chuyển trang
   const handlePageChange = (pageNumber: number) => {
-    fetchCaptions(pageNumber);
+    if (filter.searchQuery) {
+      searchCaptions(filter.searchQuery, pageNumber);
+    } else {
+      fetchCaptions(pageNumber);
+    }
   };
 
-  const handleSearch = (query: string) => {
-    setFilter({ searchQuery: query });
-    fetchCaptions(1); // Reset về trang 1 khi search
+  const handleSearch = () => {
+    setFilter({ searchQuery: searchInput });
+    searchCaptions(searchInput, 1);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchInput(value);
+    if (!value.trim()) {
+      clearSearch();
+    }
   };
 
   const handleTagFilter = (tag: string) => {
@@ -38,7 +80,11 @@ const CaptionLibrary: React.FC = () => {
       ? filter.tags.filter(t => t !== tag)
       : [...filter.tags, tag];
     setFilter({ tags: newTags });
-    fetchCaptions(1); // Reset về trang 1 khi filter
+    if (filter.searchQuery) {
+      searchCaptions(filter.searchQuery, 1);
+    } else {
+      fetchCaptions(1);
+    }
   };
 
   const handleSort = (sortBy: 'newest' | 'oldest' | 'popular') => {
@@ -72,15 +118,26 @@ const CaptionLibrary: React.FC = () => {
       {/* Search and Filters */}
       <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-pink-200 dark:border-gray-600 mb-8">
         <div className="flex flex-col md:flex-row gap-4 mb-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-3 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Tìm kiếm caption..."
-              value={filter.searchQuery}
-              onChange={(e) => handleSearch(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-            />
+          <div className="flex-1 flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 text-gray-400" size={20} />
+              <input
+                type="text"
+                placeholder="Tìm kiếm caption..."
+                value={searchInput}
+                onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+              />
+            </div>
+            <button
+              onClick={handleSearch}
+              disabled={isLoading}
+              className="px-6 py-3 bg-pink-500 text-white rounded-xl hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              <Search size={20} />
+              Tìm kiếm
+            </button>
           </div>
           
           <button
@@ -138,24 +195,60 @@ const CaptionLibrary: React.FC = () => {
         )}
       </div>
 
-      {/* Caption Grid */}
-      {filteredCaptions.length === 0 ? (
+      {/* Loading State */}
+      {isLoading && (
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-pink-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-300">Đang tải dữ liệu...</p>
+        </div>
+      )}
+
+      {/* Error State */}
+      {error && (
+        <div className="text-center py-12">
+          <div className="text-6xl mb-4">⚠️</div>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            Đã xảy ra lỗi
+          </h3>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">
+            {error}
+          </p>
+          <button
+            onClick={() => fetchCaptions(currentPage)}
+            className="px-6 py-3 bg-pink-500 text-white rounded-xl font-semibold hover:bg-pink-600 transition-all"
+          >
+            Thử lại
+          </button>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!isLoading && !error && filteredCaptions.length === 0 && (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">📝</div>
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-            Chưa có caption nào
+            {filter.searchQuery || filter.tags.length > 0 
+              ? 'Không tìm thấy kết quả phù hợp'
+              : 'Chưa có caption nào'}
           </h3>
           <p className="text-gray-600 dark:text-gray-300 mb-6">
-            Hãy tạo caption đầu tiên của bạn!
+            {filter.searchQuery || filter.tags.length > 0 
+              ? 'Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm'
+              : 'Hãy tạo caption đầu tiên của bạn!'}
           </p>
-          <button
-            onClick={() => window.dispatchEvent(new CustomEvent('navigate-to-builder'))}
-            className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-semibold hover:from-pink-600 hover:to-purple-700 transition-all"
-          >
-            Tạo Caption Ngay
-          </button>
+          {!(filter.searchQuery || filter.tags.length > 0) && (
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('navigate-to-builder'))}
+              className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-semibold hover:from-pink-600 hover:to-purple-700 transition-all"
+            >
+              Tạo Caption Ngay
+            </button>
+          )}
         </div>
-      ) : (
+      )}
+
+      {/* Caption Grid */}
+      {!isLoading && !error && filteredCaptions.length > 0 && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCaptions.map(caption => (

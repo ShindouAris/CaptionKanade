@@ -60,45 +60,82 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const token = localStorage.getItem('auth_token');
     const expTime = getTokenExpiration(token);
     const currentTime = Date.now();
+    
+    // If token is expired or will expire in less than 5 minutes, refresh immediately
+    if (expTime <= currentTime + 5 * 60 * 1000) {
+      refreshToken();
+      return;
+    }
+
     const timeUntilRefresh = expTime - currentTime - 5 * 60 * 1000; // Refresh 5 minutes before expiration
 
     if (refreshTimer) {
       clearTimeout(refreshTimer);
     }
 
-    if (timeUntilRefresh > 0) {
-      const timerId = window.setTimeout(async () => {
-        try {
-          if (!token || !user?.id) {
-            console.error('No token or user ID found');
-            logout();
-            return;
-          }
+    const timerId = window.setTimeout(refreshToken, timeUntilRefresh);
+    setRefreshTimer(timerId);
+  };
 
-          const response = await fetch(`${API_URL}/v1/user/refresh_token`, {
-            method: 'POST',
-            body: JSON.stringify({
-              token: token,
-              account_id: user?.id
-            })
+  const refreshToken = async () => {
+    try {
+      const currentToken = localStorage.getItem('auth_token');
+      
+      // Decode current token to get latest user data
+      if (!currentToken) {
+        console.error('No token found in localStorage');
+        logout();
+        return;
+      }
+
+      try {
+        const payload = JSON.parse(atob(currentToken.split('.')[1]));
+        if (!payload.id) {
+          console.error('Invalid token payload - no user ID');
+          logout();
+          return;
+        }
+
+        const response = await fetch(`${API_URL}/v1/user/refresh_token`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            token: currentToken,
+            account_id: payload.id
+          })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setToken(data.token);
+          localStorage.setItem('auth_token', data.token);
+          
+          // Update user data from new token
+          const newPayload = JSON.parse(atob(data.token.split('.')[1]));
+          setUser({
+            id: newPayload.id,
+            email: newPayload.email,
+            is_active: newPayload.is_active ?? false,
+            is_verified: newPayload.is_verified ?? false,
+            posted_count: newPayload.posted_count ?? 0,
+            updated_at: newPayload.updated_at ?? new Date().toISOString()
           });
-
-          if (response.ok) {
-            const data = await response.json();
-            setToken(data.token);
-            localStorage.setItem('auth_token', data.token);
-            setupTokenRefresh();
-          } else {
-            console.error(`Failed to refresh token: ${response.statusText} - ${response.status}`);
-            logout();
-          }
-        } catch {
-          console.error('Failed to refresh token');
+          
+          setupTokenRefresh(); // Set up next refresh
+        } else {
+          console.error(`Failed to refresh token: ${response.statusText} - ${response.status}`);
           logout();
         }
-      }, timeUntilRefresh);
-
-      setRefreshTimer(timerId);
+      } catch (error) {
+        console.error('Failed to decode token:', error);
+        logout();
+        return;
+      }
+    } catch (error) {
+      console.error('Failed to refresh token:', error);
+      logout();
     }
   };
 
