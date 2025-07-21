@@ -10,7 +10,6 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -20,13 +19,13 @@ const Login: React.FC = () => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-    if (!turnstileToken) {
-      setError('Vui lòng xác thực captcha.');
-      setIsLoading(false);
-      return;
-    }
+    // if (!turnstileToken) {
+    //   setError('Vui lòng xác thực captcha.');
+    //   setIsLoading(false);
+    //   return;
+    // }
     try {
-      await login(email, password, turnstileToken);
+      await login(email, password);
       navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Đăng nhập thất bại');
@@ -95,14 +94,6 @@ const Login: React.FC = () => {
                   )}
                 </button>
               </div>
-            </div>
-            <div>
-              <Turnstile
-                sitekey={siteKey}
-                onSuccess={setTurnstileToken}
-                onExpire={() => setTurnstileToken(null)}
-                className="my-2 flex justify-center"
-              />
             </div>
           </div>
 
