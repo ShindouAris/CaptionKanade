@@ -75,7 +75,7 @@ const IconUpload = React.memo(({
           </button>
           
           <span className="text-sm text-gray-600 dark:text-gray-400">
-            Còn {remainingQuota}/5 ảnh hôm nay
+            Còn {remainingQuota}/7 ảnh hôm nay
           </span>
         </div>
 
