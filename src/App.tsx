@@ -101,7 +101,7 @@ const Navigation = () => {
                   className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400"
                 >
                   <User size={20} />
-                  <span className="hidden md:inline">{user.email}</span>
+                  <span className="hidden md:inline">{user.username ? `@${user.username}` : user.email}</span>
                 </Link>
                 <button
                   onClick={logout}

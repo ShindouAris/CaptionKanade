@@ -150,12 +150,7 @@ const HomePage: React.FC = () => {
               {
                 icon: "💾",
                 title: "Lưu trữ an toàn",
-                description: "Dữ liệu được lưu cục bộ, không lo mất caption"
-              },
-              {
-                icon: "📤",
-                title: "Xuất nhập linh hoạt",
-                description: "Sao lưu và chia sẻ toàn bộ thư viện caption"
+                description: "Dữ liệu được lưu trên đám mây, không lo mất caption"
               },
               {
                 icon: "🌙",

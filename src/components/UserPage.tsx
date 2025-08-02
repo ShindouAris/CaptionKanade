@@ -9,6 +9,7 @@ import { TbLockQuestion } from "react-icons/tb";
 interface ExtendedUserInfo {
   email: string;
   id: string;
+  username: string; // Optional, in case username is not always present
   is_active: boolean;
   is_verified: boolean;
   developer_access: boolean;
@@ -35,6 +36,7 @@ const UserPage: React.FC = () => {
         is_verified: payload.is_verified,
         developer_access: payload.developer_access ?? false,
         plan_name: payload.plan_name ?? null,
+        username: payload.username ?? '', // Ensure username is set
         expired_at: payload.expired_at ?? null,
         posted_count: payload.posted_count ?? 0,
         created_at: payload.created_at ?? new Date().toISOString(),
@@ -61,6 +63,7 @@ const UserPage: React.FC = () => {
         setUserInfo({
           email: localInfo?.email ?? '',
           id: localInfo?.id ?? '',
+          username: localInfo?.username ?? '', // Ensure username is set
           is_active: localInfo?.is_active ?? false,
           is_verified: localInfo?.is_verified ?? false,
           developer_access: localInfo?.developer_access ?? false,
@@ -131,6 +134,18 @@ const UserPage: React.FC = () => {
                     <Mail className="w-5 h-5 text-pink-500" />
                     <span>{userInfo.email}</span>
                   </div>
+
+                  {userInfo.username ? (
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                      <Hash className="w-5 h-5 text-pink-500" />
+                      <span>{userInfo.username || 'N/A'}</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+                      <Hash className="w-5 h-5 text-pink-500" />
+                      <span>N/A</span>
+                    </div>
+                  )}
 
                   <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
                     <Hash className="w-5 h-5 text-pink-500" />

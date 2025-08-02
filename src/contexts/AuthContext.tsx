@@ -5,6 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 interface User {
   id: string;
   email: string;
+  username: string;
   is_active: boolean;
   is_verified: boolean;
   posted_count: number;
@@ -17,6 +18,7 @@ interface AuthContextType {
   login: (email: string, password: string, turnstileToken?: string) => Promise<void>;
   register: (email: string, password: string, turnstileToken?: string) => Promise<void>;
   logout: () => void;
+  setUsername: (username: string) => Promise<void>;
   getAuthHeader: () => { Authorization: string } | {};
   token: string | null;
   verifyAccount: (token: string) => Promise<void>;
@@ -41,6 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [refreshTimer, setRefreshTimer] = useState<number | null>(null);
   const [userInfo, setUserInfo] = useState<User | null>(null);
+  const [next_token, setNextToken] = useState<string | null>(null);
 
   // Function to parse JWT and get expiration time
   const getTokenExpiration = (token: string | null): number => {
@@ -117,6 +120,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser({
             id: newPayload.id,
             email: newPayload.email,
+            username: newPayload.username || '', // Ensure username is set
             is_active: newPayload.is_active ?? false,
             is_verified: newPayload.is_verified ?? false,
             posted_count: newPayload.posted_count ?? 0,
@@ -151,6 +155,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser({
             id: payload.id,
             email: payload.email,
+            username: payload.username || '',
             is_active: payload.is_active,
             is_verified: payload.is_verified,
             posted_count: payload.posted_count,
@@ -211,6 +216,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser({
           id: decodedPayload.id,
           email: decodedPayload.email,
+          username: decodedPayload.username || '', // Ensure username is set
           is_active: decodedPayload.is_active ?? false,
           is_verified: decodedPayload.is_verified ?? false,
           posted_count: decodedPayload.posted_count ?? 0,
@@ -245,6 +251,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const data = await response.json();
     setUserInfo(data);
     return data;
+  };
+
+  // const get_posted = async () => {
+  //   if (!user || !token) {
+  //     throw new Error('User not authenticated');
+  //   }
+  //   const response = await fetch(`${API_URL}/v1/member/posts${next_token ? `?next_token=${next_token}` : ''}`, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Authorization': `Bearer ${token}`,
+  //       'Content-Type': 'application/json'
+  //     }
+  //   });
+  //   if (!response.ok) {
+  //     throw new Error('Failed to fetch posted data');
+  //   }
+  //   const data = await response.json();
+  //   setNextToken(data.next_token || null);
+  //   return data;
+  // }
+
+  
+  const setUsername = async (username: string) => {
+    if (!user || !token) {
+      throw new Error('User not authenticated');
+    }
+    
+    const response = await fetch(`${API_URL}/v1/user/change_username`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username })
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to set username');
+    }
+
+    const data = await response.json();
+    if (data.status === "success") {
+      setUser(prev => {
+        if (!prev) return prev; // Handle case where prev might be null
+        return {
+          ...prev,
+          username: data.username || username // Use the returned username or fallback to the input
+        };
+      });
+    }
   };
 
   const register = async (email: string, password: string, turnstileToken?: string) => {
@@ -296,6 +352,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     loading,
     login,
     register,
+    setUsername,
     getUserInfo,
     logout,
     getAuthHeader,
