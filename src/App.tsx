@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, X, Home, Edit3, BookOpen, Moon, Sun, User } from 'lucide-react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import HomePage from './components/HomePage';
@@ -13,6 +13,7 @@ import { CaptionProvider } from './contexts/CaptionContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
+import { FiLogOut } from 'react-icons/fi';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -105,9 +106,11 @@ const Navigation = () => {
                 </Link>
                 <button
                   onClick={logout}
-                  className="text-gray-600 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400"
+                  className="flex items-center text-gray-600 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400 
+                            border border-gray-300 dark:border-white-600 px-3 py-1 rounded-lg transition-colors"
                 >
-                  Logout
+                  <FiLogOut className="w-4 h-4 mr-2" />
+                  Đăng xuất
                 </button>
               </div>
             ) : (
