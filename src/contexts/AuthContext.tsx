@@ -9,6 +9,8 @@ interface User {
   is_active: boolean;
   is_verified: boolean;
   posted_count: number;
+  favorites_received: number;
+  favorites_given: number;
   updated_at: string;
 }
 
@@ -124,6 +126,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             is_active: newPayload.is_active ?? false,
             is_verified: newPayload.is_verified ?? false,
             posted_count: newPayload.posted_count ?? 0,
+            favorites_received: newPayload.favorites_received ?? 0,
+            favorites_given: newPayload.favorites_given ?? 0,
             updated_at: newPayload.updated_at ?? new Date().toISOString()
           });
           
@@ -159,6 +163,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             is_active: payload.is_active,
             is_verified: payload.is_verified,
             posted_count: payload.posted_count,
+            favorites_received: payload.favorites_received ?? 0,
+            favorites_given: payload.favorites_given ?? 0,
             updated_at: payload.updated_at
           });
           setupTokenRefresh();
@@ -220,6 +226,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           is_active: decodedPayload.is_active ?? false,
           is_verified: decodedPayload.is_verified ?? false,
           posted_count: decodedPayload.posted_count ?? 0,
+          favorites_received: decodedPayload.favorites_received ?? 0,
+          favorites_given: decodedPayload.favorites_given ?? 0,
           updated_at: decodedPayload.updated_at ?? new Date().toISOString()
         });
 

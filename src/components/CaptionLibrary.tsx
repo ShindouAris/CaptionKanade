@@ -198,7 +198,7 @@ const CaptionLibrary: React.FC = () => {
       {/* Loading State */}
       {isLoading && (
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-pink-500 mx-auto mb-4"></div>
+          <img src='/preload.gif' className='h-48 mx-auto' alt='loading' />
           <p className="text-gray-600 dark:text-gray-300">Đang tải dữ liệu...</p>
         </div>
       )}

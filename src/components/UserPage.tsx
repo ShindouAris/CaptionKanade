@@ -3,8 +3,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { Mail, Calendar, Hash, Clock, CheckCircle2, XCircle, RefreshCw } from 'lucide-react';
 import { FaDev } from "react-icons/fa";
 import { FiDollarSign } from "react-icons/fi";
-import { FaCode } from "react-icons/fa6";
+import { FaCode, FaThreads } from "react-icons/fa6";
 import { TbLockQuestion } from "react-icons/tb";
+
 
 interface ExtendedUserInfo {
   email: string;
@@ -16,6 +17,8 @@ interface ExtendedUserInfo {
   plan_name: string | null;
   expired_at: string | null;
   posted_count: number;
+  favorites_given: number;
+  favorites_received: number;
   created_at: string;
   updated_at: string;
 }
@@ -39,6 +42,8 @@ const UserPage: React.FC = () => {
         username: payload.username ?? '', // Ensure username is set
         expired_at: payload.expired_at ?? null,
         posted_count: payload.posted_count ?? 0,
+        favorites_given: payload.favorites_given ?? 0,
+        favorites_received: payload.favorites_received ?? 0,
         created_at: payload.created_at ?? new Date().toISOString(),
         updated_at: payload.updated_at ?? new Date().toISOString(),
       };
@@ -70,6 +75,8 @@ const UserPage: React.FC = () => {
           plan_name: localInfo?.plan_name ?? null,
           expired_at: localInfo?.expired_at ?? null,
           posted_count: data.posted_count ?? 0,
+          favorites_given: data.favorites_given ?? 0,
+          favorites_received: data.favorites_received ?? 0,
           created_at: localInfo?.created_at ?? new Date().toISOString(),
           updated_at: data.updated_at ?? new Date().toISOString(),
         });
@@ -90,7 +97,7 @@ const UserPage: React.FC = () => {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-US', {
+    return new Date(dateString).toLocaleString('vi-VN', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -105,7 +112,7 @@ const UserPage: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
           {/* Header with Avatar */}
           <div className="relative h-32">
-            <img src='/banner.png' alt="Banner" className="w-full h-full object-cover" />
+            <img src='/banners/banner.jpg' alt="Banner" className="w-full h-full object-cover" />
             <div className="absolute -bottom-12 left-8">
               <div className="w-24 h-24 rounded-full bg-white dark:bg-gray-700 p-1">
                 <div className="w-full h-full rounded-full bg-gradient-to-r from-pink-500 to-purple-600 flex items-center justify-center">
@@ -122,10 +129,10 @@ const UserPage: React.FC = () => {
               <div className="space-y-4">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Account Information
+                    Thông tin tài khoản
                   </h2>
                   <p className="text-gray-500 dark:text-gray-400 text-sm">
-                    Your basic account details
+                    Thông tin cơ bản về tài khoản của bạn
                   </p>
                 </div>
 
@@ -137,12 +144,12 @@ const UserPage: React.FC = () => {
 
                   {userInfo.username ? (
                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                      <Hash className="w-5 h-5 text-pink-500" />
+                      <FaThreads className="w-5 h-5 text-pink-500" />
                       <span>{userInfo.username || 'N/A'}</span>
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                      <Hash className="w-5 h-5 text-pink-500" />
+                      <FaThreads className="w-5 h-5 text-pink-500" />
                       <span>N/A</span>
                     </div>
                   )}
@@ -154,7 +161,7 @@ const UserPage: React.FC = () => {
 
                   <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
                     <Calendar className="w-5 h-5 text-pink-500" />
-                    <span>Joined: {formatDate(userInfo.created_at)}</span>
+                    <span>Tham gia {formatDate(userInfo.created_at)}</span>
                   </div>
                 </div>
               </div>
@@ -163,10 +170,10 @@ const UserPage: React.FC = () => {
               <div className="space-y-4">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Account Status
+                    Tình trạng tài khoản
                   </h2>
                   <p className="text-gray-500 dark:text-gray-400 text-sm">
-                    Current status and permissions
+                    Tình trạng hiện tại và quyền hạn của bạn
                   </p>
                 </div>
 
@@ -226,10 +233,10 @@ const UserPage: React.FC = () => {
                 <div className="flex justify-between items-center">
                   <div>
                     <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                      Usage Statistics
+                      Thống kê sử dụng
                     </h2>
                     <p className="text-gray-500 dark:text-gray-400 text-sm">
-                      Your activity on the platform
+                      Hoạt động của bạn trên nền tảng
                     </p>
                   </div>
                   <button
@@ -243,23 +250,43 @@ const UserPage: React.FC = () => {
                 </div>
 
                 <div className="p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg">
-                  <div className="text-4xl font-bold text-pink-600 dark:text-pink-400 mb-1">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="text-4xl font-bold text-green-600 dark:text-green-400">
                     {userInfo.posted_count}
                   </div>
-                  <div className="text-sm text-pink-600 dark:text-pink-400">
-                    Captions Posted
+                  <div className="text-sm text-green-600 dark:text-green-400">
+                    Captions đã đăng
                   </div>
                 </div>
+                
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="text-4xl font-bold text-yellow-600 dark:text-yellow-400">
+                    {userInfo.favorites_given}
+                  </div>
+                  <div className="text-sm text-yellow-600 dark:text-yellow-400">
+                    Captions yêu thích
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <div className="text-4xl font-bold text-pink-600 dark:text-pink-400">
+                    {userInfo.favorites_received}
+                  </div>
+                  <div className="text-sm text-pink-600 dark:text-pink-400">
+                    Số yêu thích nhận được
+                  </div>
+                  </div>
+                </div>    
               </div>
 
               {/* Subscription Info */}
               <div className="space-y-4">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Subscription Details
+                    Thông tin đăng ký
                   </h2>
                   <p className="text-gray-500 dark:text-gray-400 text-sm">
-                    Your current plan information
+                    Thông tin về gói hiện tại của bạn
                   </p>
                 </div>
 
@@ -267,7 +294,7 @@ const UserPage: React.FC = () => {
                   <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
                     <FiDollarSign className="w-5 h-5 text-pink-500" />
                     <span>
-                      Plan: {userInfo.plan_name || 'Free Plan'}
+                      Plan: {userInfo.plan_name || 'Dev lười quá chưa làm :('}
                     </span>
                   </div>
 
@@ -275,7 +302,7 @@ const UserPage: React.FC = () => {
                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
                       <Clock className="w-5 h-5 text-pink-500" />
                       <span>
-                        Expires: {formatDate(userInfo.expired_at)}
+                        Expires: hôm nay 💀💀
                       </span>
                     </div>
                   )}
