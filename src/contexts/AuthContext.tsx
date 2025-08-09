@@ -23,6 +23,7 @@ interface AuthContextType {
   setUsername: (username: string) => Promise<void>;
   getAuthHeader: () => { Authorization: string } | {};
   token: string | null;
+  // get_posted: () => Promise<void>;
   verifyAccount: (token: string) => Promise<void>;
   submitOtp: (token: string, otp: number) => Promise<void>;
   getUserInfo: () => Promise<User | null>;
@@ -363,6 +364,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUsername,
     getUserInfo,
     logout,
+    // get_posted,
     getAuthHeader,
     token,
     userInfo,

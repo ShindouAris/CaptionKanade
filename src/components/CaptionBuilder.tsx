@@ -109,7 +109,7 @@ const IconUpload = React.memo(({
         )}
 
         <div className="text-xs text-gray-500 dark:text-gray-400">
-          • Chỉ file PNG/GIF, tối đa 3MB
+          • Chỉ file PNG/GIF, tối đa 1MB cho ảnh và 3MB cho gif
           • Tỷ lệ vuông (1:1) được khuyến nghị
         </div>
       </div>
@@ -335,7 +335,7 @@ const Preview = React.memo(({
 ));
 
 const CaptionBuilder: React.FC = () => {
-  const { addCaption, user: captionUser, canUploadIcon, getRemainingQuota, quota, fetchUserQuota } = useCaptions();
+  const { addCaption, user: captionUser, canUploadIcon, quota, fetchUserQuota } = useCaptions();
   const { user } = useAuth();
   const [captionText, setCaptionText] = useState('');
   const [selectedColor, setSelectedColor] = useState('#ffffff');
@@ -361,8 +361,8 @@ const CaptionBuilder: React.FC = () => {
   ];
 
   const handleIconUpload = async (file: File) => {
-    if (file.size > 3145728) {
-      toast.error('Kích thước file phải nhỏ hơn 3MB');
+    if (file.size > 1000000) {
+      toast.error('Kích thước file phải nhỏ hơn 1MB');
       return;
     }
 

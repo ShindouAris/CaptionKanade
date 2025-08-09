@@ -1,27 +1,8 @@
-import React, { useState, useCallback } from 'react';
-import { Search, Filter, Heart, Trash2, Tag, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
-import { FaHeart } from "react-icons/fa";
+import React, { useState } from 'react';
+import { Search, Filter, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCaptions } from '../contexts/CaptionContext';
 import { useAuth } from '../contexts/AuthContext';
-
-// Debounce utility
-const debounce = <T extends (...args: any[]) => any>(
-  func: T,
-  wait: number
-): (...args: Parameters<T>) => void => {
-  let timeout: number | undefined = undefined;
-  
-  return (...args: Parameters<T>) => {
-    if (timeout) {
-      window.clearTimeout(timeout);
-    }
-    
-    timeout = window.setTimeout(() => {
-      func(...args);
-      timeout = undefined;
-    }, wait);
-  };
-};
+import { CaptionItem } from './captionUI/CaptionItem';
 
 const CaptionLibrary: React.FC = () => {
   const { 
@@ -252,110 +233,12 @@ const CaptionLibrary: React.FC = () => {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCaptions.map(caption => (
-              <div
-                key={caption.id}
-                className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl shadow-lg border border-pink-200 dark:border-gray-600 overflow-hidden hover:shadow-xl transition-all duration-300 group"
-              >
-                {/* Caption Preview */}
-                <div className="relative aspect-video">
-                  {/* Gắn tag HOT nếu caption là phổ biến */}
-                  {caption.is_popular && (
-                    <div className="absolute top-2 left-2 z-10">
-                      <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg animate-bounce">
-                        HOT
-                      </span>
-                    </div>
-                  )}
-                  <div 
-                    className="w-full h-full"
-                    style={{
-                      background: `linear-gradient(to bottom, ${caption.colortop}, ${caption.colorbottom})`
-                    }}
-                  />
-                  
-                  <div className="absolute inset-0 flex items-center justify-center p-4">
-                    <div
-                      className="flex items-center gap-3 px-4 py-3 rounded-2xl max-w-full"
-                      style={{
-                        background: `linear-gradient(to bottom, ${caption.colortop}, ${caption.colorbottom})`,
-                        color: caption.color,
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        border: '2px solid rgba(255,255,255,0.3)'
-                      }}
-                    >
-                      {caption.icon_url && (
-                        <img 
-                          src={caption.icon_url} 
-                          alt="Icon" 
-                          className="w-6 h-6 rounded-full object-cover flex-shrink-0" 
-                        />
-                      )}
-                      <span className="text-center">
-                        {caption.text.length > 50 ? `${caption.text.substring(0, 50)}...` : caption.text}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Caption Details */}
-                <div className="p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <p className="text-gray-900 dark:text-white font-medium leading-relaxed">
-                      {caption.text}
-                    </p>
-                  </div>
-
-                  {/* Tags */}
-                  <div
-                    className="flex flex-wrap gap-1 mb-3"
-                    style={{ minHeight: '24px' }} // hoặc giá trị phù hợp với chiều cao 1 dòng tag
-                  >
-                    {caption.tags && caption.tags.length > 0 && (
-                      caption.tags.map(tag => (
-                        <span
-                          key={tag}
-                          className="inline-flex items-center gap-1 px-2 py-1 bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 rounded-full text-xs"
-                        >
-                          <Tag size={10} />
-                          {tag}
-                        </span>
-                      ))
-                    )}
-                  </div>
-
-                  {/* Meta info */}
-                  <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-4">
-                    <Calendar size={12} />
-                    {new Date(caption.created_at).toLocaleDateString('vi-VN')}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-2">
-                                      
-                    <button
-                      onClick={() => toggleFavorite(caption.id)}
-                      className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-colors ${
-                        caption.is_favorite
-                          ? 'bg-pink-200 text-white'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                      }`}
-                    >
-                      {caption.is_favorite ? <FaHeart size={14} /> : <Heart size={14} />}
-                      {caption.is_favorite ? 'Bỏ lưu' : 'Lưu'}
-                    </button>                    
-
-                    {(caption.author === user?.id) && (
-                    <button
-                      onClick={() => handleDelete(caption.id)}
-                      className="flex items-center justify-center px-3 py-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                    )}
-                  </div>
-                </div>
-              </div>
+             <CaptionItem
+              caption={caption}
+              user={user}
+              toggleFavorite={toggleFavorite}
+              handleDelete={handleDelete}
+             />
             ))}
           </div>
 

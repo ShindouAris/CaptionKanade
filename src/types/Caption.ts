@@ -11,6 +11,7 @@ export interface Caption {
   colorbottom: string;
   created_at: string;
   updated_at: string;
+  favorite_count?: number;
   is_favorite?: boolean;
   is_popular?: boolean;
 }

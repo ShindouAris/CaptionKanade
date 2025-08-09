@@ -54,7 +54,7 @@ const Navigation = () => {
 
   const navigation = [
     { id: '/', label: 'Home', icon: Home },
-    { id: '/builder', label: 'Caption Builder', icon: Edit3 },
+    { id: '/builder', label: 'Caption Studio', icon: Edit3 },
     { id: '/library', label: 'Library', icon: BookOpen },
   ];
 
