@@ -33,12 +33,12 @@ export const CaptionItem: React.FC<CaptionProps> = ({
 
       {/* Header with gradient preview */}
       <div className="relative h-32 overflow-hidden">
-        <div 
+        {/* <div 
           className="absolute inset-0"
           style={{
             background: `linear-gradient(to bottom, ${caption.colortop}, ${caption.colorbottom})`
           }}
-        />
+        /> */}
         
         {/* Caption preview overlay */}
         <div className="absolute inset-0 flex items-center justify-center p-6">
