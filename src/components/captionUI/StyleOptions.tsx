@@ -7,6 +7,7 @@ type GradientPreset = {
   top: string;
   bottom: string;
   name: string;
+  color: string;
 };
 
 const randomHexColor = (): string => {
@@ -57,6 +58,24 @@ const randomName = (): string => {
   }`;
 };
 
+function hexToRgb(hex: string) {
+  const [r, g, b] = hex.match(/\w\w/g)!.map((v) => parseInt(v, 16));
+  return { r, g, b };
+}
+
+function luminance({ r, g, b }: { r: number; g: number; b: number }) {
+  return 0.299 * r + 0.587 * g + 0.114 * b;
+}
+
+function mixColors(c1: string, c2: string) {
+  const rgb1 = hexToRgb(c1);
+  const rgb2 = hexToRgb(c2);
+  const r = Math.floor((rgb1.r + rgb2.r) / 2);
+  const g = Math.floor((rgb1.g + rgb2.g) / 2);
+  const b = Math.floor((rgb1.b + rgb2.b) / 2);
+  return `#${[r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+}
+
 export const generateGradients = (count: number): GradientPreset[] => {
   const presets: GradientPreset[] = [];
   while (presets.length < count) {
@@ -65,7 +84,13 @@ export const generateGradients = (count: number): GradientPreset[] => {
     while (colorDistance(top, bottom) < 100) {
       bottom = randomHexColor();
     }
-    presets.push({ top, bottom, name: randomName() });
+
+    // Màu chữ = màu trung gian + điều chỉnh sáng/tối
+    const mid = mixColors(top, bottom);
+    const lum = luminance(hexToRgb(mid));
+    const textColor = lum > 128 ? "#1F2937" /* text-gray-800 */ : "#F9FAFB"; /* text-gray-50 */
+
+    presets.push({ top, bottom, color: textColor, name: randomName() });
   }
   return presets;
 };
@@ -96,6 +121,7 @@ export const StyleOptions = React.memo(({
       <Button className="bg-gradient-to-br from-pink-200 to-blue-300 text-black font-comic" onClick={() => {
           const new_gradien = generateGradients(1)[0]
           onGradientChange(new_gradien.top, new_gradien.bottom)       
+          onColorChange(new_gradien.color)
         toast.success(`Đã tạo một màu mới - ${new_gradien.name}!`)
       }}>
         Random một màu mới
