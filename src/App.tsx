@@ -172,7 +172,7 @@ function App() {
     <Router>
       <AuthProvider>
         <CaptionProvider>
-          <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 transition-all duration-300">
+          <div className="min-h-screen bg-gradient-to-br from-pink-200 via-sky-100 to-indigo-500 dark:from-blue-900 dark:via-purple-900 dark:to-green-300 transition-all duration-300">
             <Toaster
               position="top-right"
               toastOptions={{

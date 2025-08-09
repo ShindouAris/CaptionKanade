@@ -29,7 +29,11 @@ export default {
   			nunito: [
   				'Nunito',
   				'sans-serif'
-  			]
+  			],
+			comic: [
+				'Comic Relief', 
+				'system-ui'
+			]
   		},
   		colors: {
   			primary: {
