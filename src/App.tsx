@@ -110,7 +110,6 @@ const Navigation = () => {
                             border border-gray-300 dark:border-white-600 px-3 py-1 rounded-lg transition-colors"
                 >
                   <FiLogOut className="w-4 h-4 mr-2" />
-                  Đăng xuất
                 </button>
               </div>
             ) : (
