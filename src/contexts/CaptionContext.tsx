@@ -245,7 +245,9 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const toggleFavorite = useCallback(async (id: string) => {
     try {
       const isFavorited = captions.find(caption => caption.id === id)?.is_favorite || false;
-      setCaptions(prev => prev.map(caption => caption.id === id ? { ...caption, is_favorite: !isFavorited } : caption));
+      setCaptions(prev => prev.map(caption => caption.id === id ? { ...caption, is_favorite: !isFavorited, favorite_count: !isFavorited 
+                                                                                                                  ? (caption.favorite_count || 0) + 1 
+                                                                                                                  : Math.max(0, (caption.favorite_count || 0) - 1) } : caption));
       const endpoint = isFavorited ? '/v1/member/unfavorite-post' : '/v1/member/add-favorite-post';
       const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
