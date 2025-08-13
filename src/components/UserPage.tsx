@@ -20,6 +20,9 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import toast from 'react-hot-toast';
+import UserUploaded from './UserComponents/Posted';
+import UserFavorited from './UserComponents/Favorited';
+import { UserTabs } from './UserComponents/TabSelections';
 
 interface ExtendedUserInfo {
   email: string;
@@ -100,9 +103,48 @@ const Change_UserName: React.FC = () => {
 
 }
 
+const ScrollToTopButton: React.FC = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const toggleVisibility = () => {
+      if (window.scrollY > 300) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+
+    window.addEventListener("scroll", toggleVisibility);
+    return () => window.removeEventListener("scroll", toggleVisibility);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
+
+  return (
+    isVisible && (
+      <span
+        onClick={scrollToTop}
+        className="fixed bottom-8 right-8 h-15 py-5 px-5 rounded-3xl bg-pink-500 text-white shadow-lg hover:bg-pink-600 transition z-[9999]"
+      >
+        <div>
+        ↑
+        </div>
+      </span>
+    )
+  );
+}
+
 const UserPage: React.FC = () => {
   const { user: authUser, getUserInfo } = useAuth();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [tab, settab] = useState("posted")
+
   const getLocalUserInfo = (): ExtendedUserInfo | null => {
     const token = localStorage.getItem('auth_token');
     if (!token) return null;
@@ -185,6 +227,7 @@ const UserPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 py-12 px-4">
+      <ScrollToTopButton />
       <div className="max-w-4xl mx-auto">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
           {/* Header with Avatar */}
@@ -335,7 +378,7 @@ const UserPage: React.FC = () => {
                     {userInfo.posted_count}
                   </div>
                   <div className="text-sm text-green-600 dark:text-green-400">
-                    Captions đã đăng
+                    Captions đã đăng (bao gồm đã xóa rồi)
                   </div>
                 </div>
                 
@@ -390,6 +433,17 @@ const UserPage: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
+        {/* Uploaded && Favorited */}
+        <div className='mt-2'>
+        <UserTabs 
+          tab={tab}
+          setTab={settab}
+          />
+        {
+          tab === "posted" ? (<UserUploaded />) : (<UserFavorited />)
+        }
+        
         </div>
       </div>
     </div>

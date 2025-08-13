@@ -23,7 +23,7 @@ interface AuthContextType {
   setUsername: (username: string) => Promise<void>;
   getAuthHeader: () => { Authorization: string } | {};
   token: string | null;
-  // get_posted: () => Promise<void>;
+  get_posted: () => Promise<void>;
   verifyAccount: (token: string) => Promise<void>;
   submitOtp: (token: string, otp: number) => Promise<void>;
   getUserInfo: () => Promise<User | null>;
@@ -262,24 +262,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return data;
   };
 
-  // const get_posted = async () => {
-  //   if (!user || !token) {
-  //     throw new Error('User not authenticated');
-  //   }
-  //   const response = await fetch(`${API_URL}/v1/member/posts${next_token ? `?next_token=${next_token}` : ''}`, {
-  //     method: 'GET',
-  //     headers: {
-  //       'Authorization': `Bearer ${token}`,
-  //       'Content-Type': 'application/json'
-  //     }
-  //   });
-  //   if (!response.ok) {
-  //     throw new Error('Failed to fetch posted data');
-  //   }
-  //   const data = await response.json();
-  //   setNextToken(data.next_token || null);
-  //   return data;
-  // }
+  const get_posted = async () => {
+    if (!user || !token) {
+      throw new Error('User not authenticated');
+    }
+    const response = await fetch(`${API_URL}/v1/member/posts${next_token ? `?next_token=${next_token}` : ''}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch posted data');
+    }
+    const data = await response.json();
+    setNextToken(data.next_token || null);
+    return data;
+  }
 
   
   const setUsername = async (username: string) => {
@@ -364,7 +364,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUsername,
     getUserInfo,
     logout,
-    // get_posted,
+    get_posted,
     getAuthHeader,
     token,
     userInfo,
