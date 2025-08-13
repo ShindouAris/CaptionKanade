@@ -19,7 +19,7 @@ export const IconUpload: React.FC<IconUploadProps> = React.memo(
     isUploading = false,
     onUpload,
     onRemove,
-    remainingQuota = 7,
+    remainingQuota = 3,
   }: IconUploadProps) => {
     const [imageSrc, setImageSrc] = useState<string | null>(null); // original uploaded image as dataURL
     const [previewUrl, setPreviewUrl] = useState<string | null>(iconPreview);
@@ -163,7 +163,7 @@ export const IconUpload: React.FC<IconUploadProps> = React.memo(
                 {isUploading ? "Đang tải..." : "Upload Icon"}
               </button>
 
-              <span className="text-sm text-gray-600 dark:text-gray-400">Còn {remainingQuota}/7 ảnh hôm nay</span>
+              <span className="text-sm text-gray-600 dark:text-gray-400">Còn {remainingQuota}/3 ảnh hôm nay</span>
             </div>
 
             <input

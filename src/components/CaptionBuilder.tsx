@@ -84,7 +84,7 @@ const CaptionBuilder: React.FC = () => {
 
   // Kiểm tra quota
   const remainingImageQuota = 20 - (quota.today_upload_count || 0);
-  const remainingIconQuota = 7 - (quota.icon_upload_count || 0);
+  const remainingIconQuota = 3 - (quota.icon_upload_count || 0);
 
   // Gọi lại fetchUserQuota sau khi upload thành công
   const handleSaveCaption = async () => {
@@ -94,7 +94,7 @@ const CaptionBuilder: React.FC = () => {
       return;
     }
     if (iconFile && remainingIconQuota <= 0) {
-      toast.error('Bạn đã hết lượt upload icon hôm nay (7/7)');
+      toast.error('Bạn đã hết lượt upload icon hôm nay (3/3)');
       return;
     }
     setIsSubmitting(true);
