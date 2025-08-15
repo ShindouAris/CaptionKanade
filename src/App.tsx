@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Menu, X, Home, Edit3, BookOpen, Moon, Sun, User } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Menu, Home, Edit3, BookOpen, Moon, Sun, LogOut } from 'lucide-react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import HomePage from './components/HomePage';
 import CaptionBuilder from './components/CaptionBuilder';
@@ -13,10 +13,20 @@ import { CaptionProvider } from './contexts/CaptionContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
-import { FiLogOut } from 'react-icons/fi';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
-const Navigation = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+interface NavigationItem {
+  id: string;
+  label: string;
+  icon: any;
+}
+
+const SidebarContent: React.FC = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const location = useLocation();
   const { user, logout } = useAuth();
@@ -40,134 +50,228 @@ const Navigation = () => {
     }
   };
 
-  const navigation = [
+  const navigation: NavigationItem[] = [
     { id: '/', label: 'Home', icon: Home },
     { id: '/builder', label: 'Caption Studio', icon: Edit3 },
     { id: '/library', label: 'Library', icon: BookOpen },
   ];
 
-  // Không hiển thị navigation trên trang đăng nhập và đăng ký
+  const getUserInitials = (user: any) => {
+    if (user?.username) {
+      return user.username.slice(0, 2).toUpperCase();
+    }
+    if (user?.email) {
+      return user.email.slice(0, 2).toUpperCase();
+    }
+    return 'U';
+  };
+
+  return (
+    <div className="flex flex-col h-full">
+      {/* Header */}
+      <div className="p-6 border-b">
+        <Link 
+          to="/" 
+          className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent"
+        >
+          CaptionKanade
+        </Link>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 p-4 overflow-y-auto">
+        <div className="space-y-1">
+          {navigation.map(({ id, label, icon: Icon }) => (
+            <Button
+              key={id}
+              variant={location.pathname === id ? "secondary" : "ghost"}
+              className={cn(
+                "w-full justify-start h-12 px-4",
+                location.pathname === id && "bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 hover:bg-pink-200 dark:hover:bg-pink-900/40"
+              )}
+              asChild
+            >
+              <Link to={id}>
+                <Icon className="mr-3 h-5 w-5" />
+                {label}
+              </Link>
+            </Button>
+          ))}
+        </div>
+      </nav>
+
+      <Separator />
+
+      {/* Footer */}
+      <div className="p-4 space-y-2">
+        {/* User Section */}
+        {user ? (
+          <div className="space-y-2">
+            <Button variant="ghost" className="w-full justify-start h-auto p-3" asChild>
+              <Link to="/profile">
+                <div className="flex items-center space-x-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src="/avatar.png" />
+                    <AvatarFallback className="bg-pink-100 text-pink-700 text-xs font-semibold">
+                      {getUserInitials(user)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col items-start">
+                    <span className="text-sm font-medium">
+                      {user.username ? `@${user.username}` : user.email}
+                    </span>
+                    {user.is_verified && (
+                      <Badge variant="secondary" className="text-xs px-2 py-0">
+                        Verified
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            </Button>
+
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20"
+              onClick={logout}
+            >
+              <LogOut className="mr-3 h-4 w-4" />
+              Logout
+            </Button>
+          </div>
+        ) : (
+          <Button className="w-full bg-pink-500 hover:bg-pink-600" asChild>
+            <Link to="/login">Login</Link>
+          </Button>
+        )}
+
+        {/* Theme Toggle */}
+        <Button 
+          variant="outline" 
+          className="w-full justify-start"
+          onClick={toggleTheme}
+        >
+          {isDarkMode ? (
+            <>
+              <Sun className="mr-3 h-4 w-4" />
+              Light Mode
+            </>
+          ) : (
+            <>
+              <Moon className="mr-3 h-4 w-4" />
+              Dark Mode
+            </>
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+interface SidebarProps {
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
+  const location = useLocation();
+
+  // Không hiển thị sidebar trên trang đăng nhập và đăng ký
   if (['/login', '/register', '/verify-email', '/reset-password'].includes(location.pathname)) {
     return null;
   }
 
   return (
-    <header className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg border-b border-pink-200 dark:border-gray-700 sticky top-0 z-50">
+    <>
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex w-64 bg-background border-r sticky top-0 h-screen">
+        <SidebarContent />
+      </aside>
 
-      {/* Cái Header */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <Link to="/" className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                CaptionKanade
-              </Link>
-            </div>
-          </div>
+      {/* Mobile Sidebar */}
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <SheetContent side="left" className="p-0 w-64">
+          <SidebarContent />
+        </SheetContent>
+      </Sheet>
+    </>
+  );
+};
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            {navigation.map(({ id, label, icon: Icon }) => (
-              <Link
-                key={id}
-                to={id}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-lg transition-all duration-200 ${
-                  location.pathname === id
-                    ? 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
-                }`}
-              >
-                <Icon size={18} />
-                <span className="font-medium">{label}</span>
-              </Link>
-            ))}
-          </nav>
+interface TopBarProps {
+  toggleSidebar: () => void;
+}
 
-          <div className="flex items-center space-x-4">
-            {/* User Menu */}
-            {user ? (
-              <div className="flex items-center space-x-4">
-                <Link
-                  to="/profile"
-                  className="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400"
-                >
-                  <User size={20} />
-                  <span className="hidden md:inline">{user.username ? `@${user.username}` : user.email}</span>
-                </Link>
-                <button
-                  onClick={logout}
-                  className="flex items-center text-gray-600 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400 
-                            border border-gray-300 dark:border-white-600 px-3 py-1 rounded-lg transition-colors"
-                >
-                  <FiLogOut className="w-4 h-4 mr-2" />
-                </button>
-              </div>
-            ) : (
-              <Link
-                to="/login"
-                className="text-gray-600 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400"
-              >
-                Login
-              </Link>
-            )}
+const TopBar: React.FC<TopBarProps> = ({ toggleSidebar }) => {
+  const location = useLocation();
 
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              aria-label="Toggle theme"
-            >
-              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
+  // Không hiển thị topbar trên trang đăng nhập và đăng ký
+  if (['/login', '/register', '/verify-email', '/reset-password'].includes(location.pathname)) {
+    return null;
+  }
 
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
-        </div>
+  return (
+    <header className="lg:hidden bg-background/80 backdrop-blur-lg border-b sticky top-0 z-30">
+      <div className="flex items-center justify-between h-16 px-4">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="sm" onClick={toggleSidebar}>
+              <Menu className="h-5 w-5" />
+            </Button>
+          </SheetTrigger>
+        </Sheet>
+        
+        <Link 
+          to="/" 
+          className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent"
+        >
+          CaptionKanade
+        </Link>
+        
+        <div className="w-10"></div>
       </div>
-
-      {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg border-t border-pink-200 dark:border-gray-700">
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            {navigation.map(({ id, label, icon: Icon }) => (
-              <Link
-                key={id}
-                to={id}
-                onClick={() => setIsMenuOpen(false)}
-                className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-all duration-200 ${
-                  location.pathname === id
-                    ? 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-pink-600 dark:hover:text-pink-400 hover:bg-pink-50 dark:hover:bg-pink-900/20'
-                }`}
-              >
-                <Icon size={18} />
-                <span className="font-medium">{label}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
     </header>
   );
 };
 
-function App() {
+interface LayoutProps {
+  children: React.ReactNode;
+}
 
+const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-pink-200 via-sky-100 to-indigo-500 dark:from-blue-900 dark:via-purple-900 dark:to-green-300 transition-all duration-300">
+      <div className="flex h-screen">
+        <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
+        
+        <div className="flex-1 flex flex-col lg:ml-0 overflow-hidden">
+          <TopBar toggleSidebar={toggleSidebar} />
+          
+          <main className="flex-1 overflow-y-auto">
+            {children}
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const App: React.FC = () => {
   useEffect(() => {
     // Hiển thị thông báo khi người dùng truy cập vào trang
-      console.log(
-        "%cChờ chút",
-        "color: blue; font-size: 40px; font-weight: bold;"
-      )
-      console.log(
-    "%cNếu bạn muốn sử dụng api của CaptionKanade, hãy apply với admin tại discord: https://discord.chisadin.site để được cung cấp quyền truy cập api chính thống và documents",
-    "color: black; font-size: 18px; font-weight: bold; font-style: italic; background: #ffdcff;"
+    console.log(
+      "%cChờ chút",
+      "color: blue; font-size: 40px; font-weight: bold;"
+    )
+    console.log(
+      "%cNếu bạn muốn sử dụng api của CaptionKanade, hãy apply với admin tại discord: https://discord.chisadin.site để được cung cấp quyền truy cập api chính thống và documents",
+      "color: black; font-size: 18px; font-weight: bold; font-style: italic; background: #ffdcff;"
     );
   }, []);
 
@@ -175,70 +279,66 @@ function App() {
     <Router>
       <AuthProvider>
         <CaptionProvider>
-          <div className="min-h-screen bg-gradient-to-br from-pink-200 via-sky-100 to-indigo-500 dark:from-blue-900 dark:via-purple-900 dark:to-green-300 transition-all duration-300">
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                duration: 3000,
-                style: {
-                  background: '#333',
-                  color: '#fff',
-                  borderRadius: '8px',
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: '#333',
+                color: '#fff',
+                borderRadius: '8px',
+              },
+              success: {
+                iconTheme: {
+                  primary: '#10B981',
+                  secondary: '#fff',
                 },
-                success: {
-                  iconTheme: {
-                    primary: '#10B981',
-                    secondary: '#fff',
-                  },
+              },
+              error: {
+                iconTheme: {
+                  primary: '#EF4444',
+                  secondary: '#fff',
                 },
-                error: {
-                  iconTheme: {
-                    primary: '#EF4444',
-                    secondary: '#fff',
-                  },
-                },
-              }}
-            />
-            <Navigation />
-            
-            {/* Main Content */}
-            <main className="flex-1">
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/verify-email" element={<EmailVerification />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                
-                <Route path="/" element={
-                  <ProtectedRoute>
-                    <HomePage />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/builder" element={
-                  <ProtectedRoute>
-                    <CaptionBuilder />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/library" element={
-                  <ProtectedRoute>
-                    <CaptionLibrary />
-                  </ProtectedRoute>
-                } />
-                
-                <Route path="/profile" element={
-                  <ProtectedRoute requireVerified>
-                    <UserPage />
-                  </ProtectedRoute>
-                } />
-              </Routes>
-            </main>
-          </div>
+              },
+            }}
+          />
+          
+          <Layout>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/verify-email" element={<EmailVerification />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <HomePage />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/builder" element={
+                <ProtectedRoute>
+                  <CaptionBuilder />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/library" element={
+                <ProtectedRoute>
+                  <CaptionLibrary />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/profile" element={
+                <ProtectedRoute requireVerified>
+                  <UserPage />
+                </ProtectedRoute>
+              } />
+            </Routes>
+          </Layout>
         </CaptionProvider>
       </AuthProvider>
     </Router>
   );
-}
+};
 
 export default App;
