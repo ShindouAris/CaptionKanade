@@ -47,7 +47,7 @@ interface CaptionContextType {
   };
   setFilter: (newFilter: Partial<CaptionContextType['filter']>) => void;
   availableTags: string[];
-  addCaption: (caption: Omit<Caption, 'id' | 'created_at' | 'updated_at'>) => Promise<void>;
+  addCaption: (caption: Omit<Caption, 'id' | 'created_at' | 'updated_at'>) => Promise<Caption>;
   deleteCaption: (id: string) => Promise<void>;
   toggleFavorite: (id: string) => Promise<void>;
   fetchCaptions: (page: number) => Promise<void>;
@@ -179,7 +179,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  const addCaption = async (newCaption: Omit<Caption, 'id' | 'created_at' | 'updated_at'>) => {
+  const addCaption = async (newCaption: Omit<Caption, 'id' | 'created_at' | 'updated_at'>): Promise<Caption> => {
     try {
       const formData = new FormData();
       formData.append('text', newCaption.text);
@@ -211,13 +211,14 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
         throw new Error('Failed to create caption');
       }
 
-      const savedCaption = await response.json();
+      const savedCaption: Caption = await response.json();
       setCaptions(prev => [...prev, { ...savedCaption, is_favorite: false }]);
 
       // Only update quota if icon was uploaded successfully
       if (iconFile) {
         updateUserQuota();
       }
+      return savedCaption;
     } catch (error) {
       console.error('Error adding caption:', error);
       throw error;
@@ -398,10 +399,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       }
     });
 
-  // Get all unique tags
-  const availableTags = Array.from(
-    new Set(captions.flatMap(caption => caption.tags || []))
-  );
+  // Unique tags are provided inline in the context value
 
   const handleFilterUpdate = (newFilter: Partial<CaptionContextType['filter']>) => {
     setFilter(prev => ({

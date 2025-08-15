@@ -11,6 +11,7 @@ import { StyleOptions } from './captionUI/StyleOptions';
 import { TagsSection } from './captionUI/TagSelection';
 import { IconUpload } from './captionUI/IconUpload';
 import { Preview } from './captionUI/Preview';
+import { CaptionUploadSuccess } from './captionUI/CaptionUploadSuccess';
 
 
 const CaptionBuilder: React.FC = () => {
@@ -26,6 +27,8 @@ const CaptionBuilder: React.FC = () => {
   const [showPreview, setShowPreview] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showUploadSuccess, setShowUploadSuccess] = useState(false);
+  const [uploadedCaption, setUploadedCaption] = useState<Caption | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const gradientPresets = [
@@ -111,7 +114,9 @@ const CaptionBuilder: React.FC = () => {
         colorbottom: selectedColorBottom,
         is_favorite: false
       };
-      await addCaption(captionData);
+      const saved = await addCaption(captionData);
+      setUploadedCaption(saved);
+      setShowUploadSuccess(true);
       toast.success('Đã đăng caption thành công');
       // Reset form
       setCaptionText('');
@@ -274,6 +279,12 @@ const CaptionBuilder: React.FC = () => {
 
       {/* Hidden canvas for image generation */}
       <canvas ref={canvasRef} className="hidden" />
+
+      <CaptionUploadSuccess
+        open={showUploadSuccess}
+        onOpenChange={setShowUploadSuccess}
+        caption={uploadedCaption}
+      />
     </div>
   );
 };
