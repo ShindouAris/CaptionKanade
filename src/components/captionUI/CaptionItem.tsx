@@ -59,24 +59,32 @@ export const CaptionItem: React.FC<CaptionProps> = ({
         /> */}
         
         {/* Caption preview overlay */}
-        <div className="absolute inset-0 flex items-center justify-center p-6">
+        <div className="absolute inset-0 flex items-center justify-center p-6 lg:p-8">
           <div 
-            className="flex items-center gap-3 px-4 py-3 rounded-2xl max-w-full backdrop-blur-sm"
+            className="
+              flex items-center gap-3 px-4 py-2 rounded-2xl max-w-full backdrop-blur-sm
+              lg:px-6 lg:py-3 lg:gap-5
+              transition-all duration-300
+            "
             style={{
               background: `linear-gradient(to bottom, ${caption.colortop}, ${caption.colorbottom})`,
               color: caption.color,
-              border: '2px solid rgba(255,255,255,0.3)'
+              border: '2px solid rgba(255,255,255,0.3)',
             }}
           >
             {caption.icon_url && (
               <img 
                 src={caption.icon_url} 
                 alt="Icon" 
-                className="w-5 h-5 rounded-full object-cover flex-shrink-0" 
+                className="w-5 h-5 rounded-md object-cover flex-shrink-0
+                  lg:w-8 lg:h-8
+                " 
               />
             )}
             <span 
-              className="text-sm font-bold truncate max-w-48"
+              className="text-sm font-bold truncate max-w-48
+                lg:text-lg lg:max-w-xl
+              "
               style={{ color: caption.color }}
             >
               {caption.text.length > 40 ? `${caption.text.substring(0, 40)}...` : caption.text}
@@ -186,22 +194,29 @@ export const CaptionItem: React.FC<CaptionProps> = ({
               className="w-full h-64 rounded-2xl flex items-center justify-center"
             >
               <div 
-              className="flex items-center gap-3 px-6 py-5 rounded-2xl max-w-full backdrop-blur-sm"
-              style={{
-                background: `linear-gradient(to bottom, ${caption.colortop}, ${caption.colorbottom})`,
-                color: caption.color,
-                border: '2px solid rgba(255,255,255,0.3)'
-              }}
+                className="
+                  flex items-center gap-3 
+                  px-6 py-3 
+                  rounded-3xl max-w-full 
+                  backdrop-blur-sm
+                  sm:px-10 sm:py-5 sm:gap-6
+                  sm:min-h-[80px]
+                "
+                style={{
+                  background: `linear-gradient(to bottom, ${caption.colortop}, ${caption.colorbottom})`,
+                  color: caption.color,
+                  border: '2px solid rgba(255,255,255,0.3)'
+                }}
               >
                 {caption.icon_url && (
                   <img 
                     src={caption.icon_url} 
                     alt="Icon" 
-                    className="w-5 h-5 rounded-full object-cover flex-shrink-0" 
+                    className="w-10 h-10 sm:w-8 sm:h-8 rounded-md object-cover flex-shrink-0" 
                   />
                 )}
                 <span 
-                  className="text-sm font-bold truncate max-w-48"
+                  className="text-sm sm:text-xl font-bold truncate max-w-48 sm:max-w-xs"
                   style={{ color: caption.color }}
                 >
                   {caption.text.length > 40 ? `${caption.text.substring(0, 40)}...` : caption.text}
