@@ -198,6 +198,10 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (iconFile) {
         formData.append('icon_url', iconFile);
       }
+      const icon_url = (newCaption as any).icon_link as string | undefined;
+      if (icon_url) {
+        formData.append('icon_link', icon_url)
+      }
 
       const response = await fetch(`${API_URL}/captions/create`, {
         method: 'POST',

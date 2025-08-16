@@ -12,6 +12,7 @@ import { TagsSection } from './captionUI/TagSelection';
 import { IconUpload } from './captionUI/IconUpload';
 import { Preview } from './captionUI/Preview';
 import { CaptionUploadSuccess } from './captionUI/CaptionUploadSuccess';
+import IconUrlUpload from './captionUI/IconURLUpload';
 
 
 const CaptionBuilder: React.FC = () => {
@@ -23,6 +24,7 @@ const CaptionBuilder: React.FC = () => {
   const [selectedColorBottom, setSelectedColorBottom] = useState('#B5FFFC');
   const [iconFile, setIconFile] = useState<File | null>(null);
   const [iconPreview, setIconPreview] = useState<string>('');
+  const [iconUrl, setIconUrl] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
   const [showPreview, setShowPreview] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
@@ -85,14 +87,28 @@ const CaptionBuilder: React.FC = () => {
     }
   };
 
+  const handleIconUrlUpload = async (url: string) => {
+
+    setIsUploading(true);
+    try {
+      setIconPreview(url);
+      setIconUrl(url);
+    } catch (error) {
+      console.error('Error uploading icon:', error);
+      toast.error('Có lỗi xảy ra khi tải lên icon. Vui lòng thử lại.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   // Kiểm tra quota
-  const remainingImageQuota = 20 - (quota.today_upload_count || 0);
+  const remainingCaptionQuota = 20 - (quota.today_upload_count || 0);
   const remainingIconQuota = 3 - (quota.icon_upload_count || 0);
 
   // Gọi lại fetchUserQuota sau khi upload thành công
   const handleSaveCaption = async () => {
     if (!user) return;
-    if (remainingImageQuota <= 0) {
+    if (remainingCaptionQuota <= 0) {
       toast.error('Bạn đã hết lượt upload caption hôm nay (20/20)');
       return;
     }
@@ -109,6 +125,7 @@ const CaptionBuilder: React.FC = () => {
         type: iconFile ? 'image_icon' : 'background',
         icon_url: '',
         icon_file: iconFile || undefined,
+        icon_link: iconUrl || undefined,
         color: selectedColor,
         colortop: selectedColorTop,
         colorbottom: selectedColorBottom,
@@ -123,6 +140,7 @@ const CaptionBuilder: React.FC = () => {
       setTags([]);
       setIconFile(null);
       setIconPreview('');
+      setIconUrl('')
       setSelectedColor('#ffffff');
       setSelectedColorTop('#FFDEE9');
       setSelectedColorBottom('#B5FFFC');
@@ -139,6 +157,7 @@ const CaptionBuilder: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
       <div className="mb-8">
         <h1 className="text-3xl font-bold dark:text-white to-purple-600 mb-2">
           Caption Studio
@@ -149,7 +168,7 @@ const CaptionBuilder: React.FC = () => {
         {/* <div className="mt-2 flex gap-4 text-sm text-gray-700 dark:text-gray-300">
           <span>Quota caption: <b>{remainingImageQuota}</b>/40</span>
           <span>Quota icon: <b>{remainingIconQuota}</b>/5</span>
-        </div> */}
+          </div> */}
       </div>
 
       <div className="grid lg:grid-cols-2 gap-8">
@@ -158,19 +177,33 @@ const CaptionBuilder: React.FC = () => {
           <CaptionText value={captionText} onChange={setCaptionText} />
 
           {/* Icon Upload - Only for Members */}
-          {!captionUser.isMember && (
+          
+          {!iconFile && (
+            <IconUrlUpload 
+            iconPreview={iconPreview}
+            isUploading={isUploading}
+            onUpload={handleIconUrlUpload}
+            onRemove={() => {
+              setIconPreview('');
+              setIconUrl('');
+              }}
+            remainingQuota={remainingCaptionQuota}
+            />
+          )}
+
+          {!captionUser.isMember && !iconUrl && (remainingIconQuota > 0) && (
             <IconUpload
-              iconFile={iconFile}
-              iconPreview={iconPreview}
-              isUploading={isUploading}
-              onUpload={handleIconUpload}
-              onRemove={() => {
+            iconFile={iconFile}
+            iconPreview={iconPreview}
+            isUploading={isUploading}
+            onUpload={handleIconUpload}
+            onRemove={() => {
                 setIconFile(null);
                 setIconPreview('');
               }}
               remainingQuota={remainingIconQuota}
-            />
-          )}
+              />
+            )}
 
           {/* Non-member notice */}
           {captionUser.isMember && (
@@ -213,7 +246,7 @@ const CaptionBuilder: React.FC = () => {
               }
             }}
             onRemoveTag={(tag) => setTags(tags.filter(t => t !== tag))}
-          />
+            />
         </div>
 
         {/* Preview Panel */}
@@ -226,15 +259,15 @@ const CaptionBuilder: React.FC = () => {
             selectedColorTop={selectedColorTop}
             selectedColorBottom={selectedColorBottom}
             iconPreview={iconPreview}
-          />
+            />
 
           {/* Actions */}
           <div className="flex gap-4">
             <button
               onClick={handleSaveCaption}
-              disabled={Boolean(!user || !user.is_verified || isSubmitting || remainingImageQuota <= 0 || (iconFile && remainingIconQuota <= 0))}
+              disabled={Boolean(!user || !user.is_verified || isSubmitting || remainingCaptionQuota <= 0 || (iconFile && remainingIconQuota <= 0))}
               className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-semibold hover:from-pink-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
+              >
               {!user?.is_verified ? (
                 <>
                   <MdNearMeDisabled size={20} />
@@ -245,7 +278,7 @@ const CaptionBuilder: React.FC = () => {
                   <Loader2 size={20} className="animate-spin" />
                   Đang đăng...
                 </>
-              ) : remainingImageQuota <= 0 ? (
+              ) : remainingCaptionQuota <= 0 ? (
                 <>
                   <MdNearMeDisabled size={20} />
                   Đã hết lượt upload caption hôm nay
@@ -270,8 +303,8 @@ const CaptionBuilder: React.FC = () => {
                 background: "linear-gradient(to right, #f9a8d4, #8b5cf6)",
                 color: "#374151"
               }}
-            >
-              Bạn còn {remainingImageQuota} lượt upload caption hôm nay
+              >
+              Bạn còn {remainingCaptionQuota} lượt upload caption hôm nay
             </div>
           </div>
         </div>
@@ -284,8 +317,8 @@ const CaptionBuilder: React.FC = () => {
         open={showUploadSuccess}
         onOpenChange={setShowUploadSuccess}
         caption={uploadedCaption}
-      />
-    </div>
+        />
+      </div>
   );
 };
 

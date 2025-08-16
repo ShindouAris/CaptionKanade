@@ -4,6 +4,7 @@ export interface Caption {
   text: string;
   type: 'background' | 'image_icon' | 'image_gif';
   icon_url?: string;
+  icon_link?: string;
   icon_delete_link?: string;
   tags: string[] | null;
   color: string;
