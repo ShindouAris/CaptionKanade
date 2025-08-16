@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -30,6 +30,84 @@ interface AuthContextType {
   userInfo: User | null;
 }
 
+// Token utility functions
+class TokenManager {
+  private static readonly TOKEN_KEY = 'auth_token';
+  private static readonly REFRESH_BUFFER_MS = 5 * 60 * 1000; // 5 minutes
+
+  static getToken(): string | null {
+    try {
+      return localStorage.getItem(this.TOKEN_KEY);
+    } catch {
+      return null;
+    }
+  }
+
+  static setToken(token: string): void {
+    try {
+      localStorage.setItem(this.TOKEN_KEY, token);
+    } catch (error) {
+      console.error('Failed to store token:', error);
+    }
+  }
+
+  static removeToken(): void {
+    try {
+      localStorage.removeItem(this.TOKEN_KEY);
+    } catch (error) {
+      console.error('Failed to remove token:', error);
+    }
+  }
+
+  static parseTokenPayload(token: string | null): any {
+    if (!token) return null;
+    
+    try {
+      const parts = token.split('.');
+      if (parts.length !== 3) {
+        throw new Error('Invalid token format');
+      }
+      
+      const payload = JSON.parse(atob(parts[1]));
+      return payload;
+    } catch (error) {
+      console.error('Failed to parse token:', error);
+      return null;
+    }
+  }
+
+  static getTokenExpiration(token: string | null): number {
+    const payload = this.parseTokenPayload(token);
+    return payload?.exp ? payload.exp * 1000 : 0;
+  }
+
+  static isTokenExpired(token: string | null): boolean {
+    const expTime = this.getTokenExpiration(token);
+    return expTime <= Date.now();
+  }
+
+  static shouldRefreshToken(token: string | null): boolean {
+    const expTime = this.getTokenExpiration(token);
+    return expTime <= Date.now() + this.REFRESH_BUFFER_MS;
+  }
+
+  static createUserFromPayload(payload: any): User | null {
+    if (!payload?.id || !payload?.email) return null;
+
+    return {
+      id: payload.id,
+      email: payload.email,
+      username: payload.username || '',
+      is_active: payload.is_active ?? false,
+      is_verified: payload.is_verified ?? false,
+      posted_count: payload.posted_count ?? 0,
+      favorites_received: payload.favorites_received ?? 0,
+      favorites_given: payload.favorites_given ?? 0,
+      updated_at: payload.updated_at ?? new Date().toISOString()
+    };
+  }
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
@@ -44,62 +122,67 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [refreshTimer, setRefreshTimer] = useState<number | null>(null);
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const [next_token, setNextToken] = useState<string | null>(null);
 
-  // Function to parse JWT and get expiration time
-  const getTokenExpiration = (token: string | null): number => {
-    try {
-      if (!token) {
-        return 0;
-      }
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.exp * 1000; // Convert to milliseconds
-    } catch {
-      return 0;
-    }
-  };
+  // Use refs to track refresh state and prevent multiple concurrent refreshes
+  const refreshTimeoutRef = useRef<number | null>(null);
+  const isRefreshingRef = useRef<boolean>(false);
+  const refreshPromiseRef = useRef<Promise<void> | null>(null);
 
-  // Function to set up token refresh
-  const setupTokenRefresh = () => {
-    const token = localStorage.getItem('auth_token');
-    const expTime = getTokenExpiration(token);
-    const currentTime = Date.now();
+  // Clear refresh timeout
+  const clearRefreshTimeout = useCallback(() => {
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
+      refreshTimeoutRef.current = null;
+    }
+  }, []);
+
+  // Handle authentication state cleanup
+  const clearAuthState = useCallback(() => {
+    setUser(null);
+    setToken(null);
+    setUserInfo(null);
+    TokenManager.removeToken();
+    clearRefreshTimeout();
+    isRefreshingRef.current = false;
+    refreshPromiseRef.current = null;
+  }, [clearRefreshTimeout]);
+
+  // Update user state from token
+  const updateUserFromToken = useCallback((newToken: string) => {
+    const payload = TokenManager.parseTokenPayload(newToken);
+    const newUser = TokenManager.createUserFromPayload(payload);
     
-    // If token is expired or will expire in less than 5 minutes, refresh immediately
-    if (expTime <= currentTime + 5 * 60 * 1000) {
-      refreshToken();
-      return;
+    if (newUser) {
+      setUser(newUser);
+      setToken(newToken);
+      TokenManager.setToken(newToken);
+      return true;
+    }
+    return false;
+  }, []);
+
+  // Refresh token function
+  const refreshToken = useCallback(async (): Promise<void> => {
+    // Prevent multiple concurrent refresh attempts
+    if (isRefreshingRef.current && refreshPromiseRef.current) {
+      return refreshPromiseRef.current;
     }
 
-    const timeUntilRefresh = expTime - currentTime - 5 * 60 * 1000; // Refresh 5 minutes before expiration
-
-    if (refreshTimer) {
-      clearTimeout(refreshTimer);
-    }
-
-    const timerId = window.setTimeout(refreshToken, timeUntilRefresh);
-    setRefreshTimer(timerId);
-  };
-
-  const refreshToken = async () => {
-    try {
-      const currentToken = localStorage.getItem('auth_token');
-      
-      // Decode current token to get latest user data
-      if (!currentToken) {
-        console.error('No token found in localStorage');
-        logout();
-        return;
-      }
-
+    isRefreshingRef.current = true;
+    
+    const refreshPromise = (async () => {
       try {
-        const payload = JSON.parse(atob(currentToken.split('.')[1]));
-        if (!payload.id) {
-          console.error('Invalid token payload - no user ID');
-          logout();
-          return;
+        const currentToken = TokenManager.getToken();
+        
+        if (!currentToken) {
+          throw new Error('No token found');
+        }
+
+        const payload = TokenManager.parseTokenPayload(currentToken);
+        if (!payload?.id) {
+          throw new Error('Invalid token payload');
         }
 
         const response = await fetch(`${API_URL}/v1/user/refresh_token`, {
@@ -113,72 +196,104 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           })
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          setToken(data.token);
-          localStorage.setItem('auth_token', data.token);
-          
-          // Update user data from new token
-          const newPayload = JSON.parse(atob(data.token.split('.')[1]));
-          setUser({
-            id: newPayload.id,
-            email: newPayload.email,
-            username: newPayload.username || '', // Ensure username is set
-            is_active: newPayload.is_active ?? false,
-            is_verified: newPayload.is_verified ?? false,
-            posted_count: newPayload.posted_count ?? 0,
-            favorites_received: newPayload.favorites_received ?? 0,
-            favorites_given: newPayload.favorites_given ?? 0,
-            updated_at: newPayload.updated_at ?? new Date().toISOString()
-          });
-          
-          setupTokenRefresh(); // Set up next refresh
-        } else {
-          console.error(`Failed to refresh token: ${response.statusText} - ${response.status}`);
-          logout();
+        if (!response.ok) {
+          throw new Error(`Refresh failed: ${response.status} ${response.statusText}`);
         }
+
+        const data = await response.json();
+        
+        if (!data.token) {
+          throw new Error('No token in refresh response');
+        }
+
+        // Update auth state with new token
+        const success = updateUserFromToken(data.token);
+        if (!success) {
+          throw new Error('Failed to update user from refreshed token');
+        }
+
+        // Schedule next refresh
+        scheduleTokenRefresh(data.token);
+        
       } catch (error) {
-        console.error('Failed to decode token:', error);
-        logout();
-        return;
+        console.error('Token refresh failed:', error);
+        clearAuthState();
+        throw error;
+      } finally {
+        isRefreshingRef.current = false;
+        refreshPromiseRef.current = null;
       }
-    } catch (error) {
-      console.error('Failed to refresh token:', error);
-      logout();
-    }
-  };
+    })();
 
+    refreshPromiseRef.current = refreshPromise;
+    return refreshPromise;
+  }, [updateUserFromToken, clearAuthState]);
+
+  // Schedule token refresh
+  const scheduleTokenRefresh = useCallback((tokenToCheck: string | null = null) => {
+    const targetToken = tokenToCheck || TokenManager.getToken();
+    
+    if (!targetToken || TokenManager.isTokenExpired(targetToken)) {
+      clearAuthState();
+      return;
+    }
+
+    if (TokenManager.shouldRefreshToken(targetToken)) {
+      // Token needs immediate refresh
+      refreshToken().catch(() => {
+        // Error handling is done in refreshToken
+      });
+      return;
+    }
+
+    // Schedule future refresh
+    clearRefreshTimeout();
+    const expTime = TokenManager.getTokenExpiration(targetToken);
+    const timeUntilRefresh = expTime - Date.now() - TokenManager['REFRESH_BUFFER_MS'];
+
+    if (timeUntilRefresh > 0) {
+      refreshTimeoutRef.current = window.setTimeout(() => {
+        refreshToken().catch(() => {
+          // Error handling is done in refreshToken
+        });
+      }, timeUntilRefresh);
+    }
+  }, [refreshToken, clearAuthState, clearRefreshTimeout]);
+
+  // Initialize auth state on mount
   useEffect(() => {
-    // Check for saved token on mount
-    const savedToken = localStorage.getItem('auth_token');
-    if (savedToken) {
-      try {
-        const expTime = getTokenExpiration(savedToken);
-        if (expTime > Date.now()) {
-          setToken(savedToken);
-          const payload = JSON.parse(atob(savedToken.split('.')[1]));
-          setUser({
-            id: payload.id,
-            email: payload.email,
-            username: payload.username || '',
-            is_active: payload.is_active,
-            is_verified: payload.is_verified,
-            posted_count: payload.posted_count,
-            favorites_received: payload.favorites_received ?? 0,
-            favorites_given: payload.favorites_given ?? 0,
-            updated_at: payload.updated_at
-          });
-          setupTokenRefresh();
+    const initializeAuth = () => {
+      const savedToken = TokenManager.getToken();
+      // const token_payload = TokenManager.parseTokenPayload(savedToken);
+      // const current_time = new Date();
+      // const expired_at = new Date(token_payload.exp * 1000);
+      // console.log(`Token expired at: ${expired_at}`)
+      // console.log(`Current time: ${current_time}`)
+      // console.log(`Time until refresh: ${Math.floor((expired_at.getTime() - current_time.getTime()) / 1000)}s`)
+      if (savedToken && !TokenManager.isTokenExpired(savedToken)) {
+        const success = updateUserFromToken(savedToken);
+        if (success) {
+          scheduleTokenRefresh(savedToken);
         } else {
-          localStorage.removeItem('auth_token');
+          clearAuthState();
         }
-      } catch {
-        localStorage.removeItem('auth_token');
+      } else if (savedToken) {
+        // Token exists but is expired
+        TokenManager.removeToken();
       }
-    }
-    setLoading(false);
-  }, []);
+      
+      setLoading(false);
+    };
 
+    initializeAuth();
+
+    // Cleanup on unmount
+    return () => {
+      clearRefreshTimeout();
+    };
+  }, [updateUserFromToken, scheduleTokenRefresh, clearAuthState, clearRefreshTimeout]);
+
+  // Login function
   const login = async (email: string, password: string, turnstileToken?: string) => {
     setLoading(true);
     try {
@@ -199,51 +314,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error(data.detail || 'Đăng nhập thất bại');
       }
 
-      if (!data.data.token) {
+      if (!data.data?.token) {
         throw new Error('Không nhận được token từ server');
       }
 
-      // Store token first
-      setToken(data.data.token);
-      localStorage.setItem('auth_token', data.data.token);
-
-      try {
-        // @ts-ignore
-        const [header, payload, signature] = data.data.token.split('.');
-        if (!payload) {
-          throw new Error('Định dạng token không hợp lệ');
-        }
-
-        const decodedPayload = JSON.parse(atob(payload));
-        
-        if (!decodedPayload.id || !decodedPayload.email) {
-          throw new Error('Token payload thiếu các trường bắt buộc');
-        }
-
-        setUser({
-          id: decodedPayload.id,
-          email: decodedPayload.email,
-          username: decodedPayload.username || '', // Ensure username is set
-          is_active: decodedPayload.is_active ?? false,
-          is_verified: decodedPayload.is_verified ?? false,
-          posted_count: decodedPayload.posted_count ?? 0,
-          favorites_received: decodedPayload.favorites_received ?? 0,
-          favorites_given: decodedPayload.favorites_given ?? 0,
-          updated_at: decodedPayload.updated_at ?? new Date().toISOString()
-        });
-
-        setupTokenRefresh();
-      } catch (tokenError: any) {
-        // If token parsing fails, clean up and throw error
-        setToken(null);
-        localStorage.removeItem('auth_token');
-        throw new Error(`Lỗi phân tích token: ${tokenError.message}`);
+      const success = updateUserFromToken(data.data.token);
+      if (!success) {
+        throw new Error('Token không hợp lệ');
       }
+
+      scheduleTokenRefresh(data.data.token);
+      
+    } catch (error) {
+      clearAuthState();
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const register = async (email: string, password: string, turnstileToken?: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/v1/user/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email, password, turnstile_token: turnstileToken })
+      });
+
+      if (!response.ok) {
+        throw new Error('Đăng ký thất bại');
+      }
+
+      await login(email, password);
     } catch (error) {
       throw error;
     } finally {
       setLoading(false);
     }
+  };
+
+  const logout = () => {
+    clearAuthState();
   };
 
   const getUserInfo = async () => {
@@ -279,9 +393,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const data = await response.json();
     setNextToken(data.next_token || null);
     return data;
-  }
+  };
 
-  
   const setUsername = async (username: string) => {
     if (!user || !token) {
       throw new Error('User not authenticated');
@@ -303,45 +416,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const data = await response.json();
     if (data.status === "success") {
       setUser(prev => {
-        if (!prev) return prev; // Handle case where prev might be null
+        if (!prev) return prev;
         return {
           ...prev,
-          username: data.username || username // Use the returned username or fallback to the input
+          username: data.username || username
         };
       });
-    }
-  };
-
-  const register = async (email: string, password: string, turnstileToken?: string) => {
-    setLoading(true);
-    try {
-      const response = await fetch(`${API_URL}/v1/user/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password, turnstile_token: turnstileToken })
-      });
-
-      if (!response.ok) {
-        throw new Error('Đăng ký thất bại');
-      }
-
-      await login(email, password);
-    } catch (error) {
-      throw error;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem('auth_token');
-    if (refreshTimer) {
-      clearTimeout(refreshTimer);
-      setRefreshTimer(null);
     }
   };
 
@@ -356,6 +436,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   };
 
+  const verifyAccount = async (token: string) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/v1/user/verify_account`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ token })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.detail || 'Failed to request verification');
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitOtp = async (token: string, otp: number) => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/v1/user/submit_otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ token, otp })
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.detail || 'Lỗi xác thực OTP');
+      }
+      
+      const data = await response.json();
+      if (data.status === "failed") {
+        throw new Error(data.message || 'Lỗi xác thực OTP');
+      }
+
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const value = {
     user,
     loading,
@@ -368,54 +498,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     getAuthHeader,
     token,
     userInfo,
-    verifyAccount: async (token: string) => {
-      setLoading(true);
-      try {
-        const response = await fetch(`${API_URL}/v1/user/verify_account`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ token })
-        });
-
-        if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.detail || 'Failed to request verification');
-        }
-      } catch (error) {
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    },
-    submitOtp: async (token: string, otp: number) => {
-      setLoading(true);
-      try {
-        const response = await fetch(`${API_URL}/v1/user/submit_otp`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ token, otp })
-        });
-
-        if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.detail || 'Lỗi xác thực OTP');
-        }
-        
-        const data = await response.json();
-        if (data.status === "failed") {
-          throw new Error(data.message || 'Lỗi xác thực OTP');
-        }
-
-      } catch (error) {
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    },
+    verifyAccount,
+    submitOtp,
   };
 
   return (
