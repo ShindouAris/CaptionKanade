@@ -12,7 +12,7 @@ import { TagsSection } from './captionUI/TagSelection';
 import { IconUpload } from './captionUI/IconUpload';
 import { Preview } from './captionUI/Preview';
 import { CaptionUploadSuccess } from './captionUI/CaptionUploadSuccess';
-import {IconUrlUpload} from './captionUI/IconURLUpload';
+import {IconUrlUpload} from './captionUI/IconUrlUpload';
 
 
 const CaptionBuilder: React.FC = () => {
