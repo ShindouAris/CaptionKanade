@@ -20,6 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { BadgeCheckIcon } from 'lucide-react';
 
 interface NavigationItem {
   id: string;
@@ -122,11 +123,18 @@ const SidebarContent: React.FC = () => {
                     <span className="text-sm font-medium">
                       {user.username ? `@${user.username}` : user.email}
                     </span>
-                    {user.is_verified && (
-                      <Badge variant="secondary" className="text-xs px-2 py-0">
-                        Verified
-                      </Badge>
-                    )}
+                    <div className="flex items-center gap-[5px]">
+                      {user.is_verified && (
+                        <Badge variant="secondary" className="bg-green-500 text-white dark:bg-green-600 px-1 py-0 text-[10px] h-5 flex items-center">
+                          <BadgeCheckIcon className="w-3 h-3 mr-1" />
+                        </Badge>
+                      )}
+                      {user?.id === "0fd2189f-1873-42bb-b2c8-6443772d12e3" && (
+                        <Badge variant="secondary" className="text-xs px-2 py-0 bg-gradient-to-r from-pink-300 to-blue-300 text-white h-5 flex items-center">
+                          Admin - Developer
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
               </Link>
