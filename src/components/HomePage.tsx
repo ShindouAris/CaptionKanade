@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Badge } from './ui/badge';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -44,6 +45,25 @@ const HomePage: React.FC = () => {
         <div className="absolute top-20 left-10 w-16 h-16 bg-pink-200 dark:bg-pink-800 rounded-full animate-pulse opacity-60"></div>
         <div className="absolute bottom-20 right-10 w-20 h-20 bg-purple-200 dark:bg-purple-800 rounded-full animate-bounce opacity-60"></div>
         <div className="absolute top-1/2 left-1/4 w-8 h-8 bg-indigo-200 dark:bg-indigo-800 rounded-full animate-ping opacity-40"></div>
+      </section>
+
+      <section className="py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mx-auto bg-white/80 dark:bg-gray-800/80 rounded-2xl shadow-lg border border-pink-300 dark:border-green-600 p-6 text-center">
+          <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+            Khảo sát ý kiến người dùng
+          </h3>
+          <p className="text-gray-700 dark:text-gray-300 mb-4">
+            Hãy giúp chúng mình cải thiện CaptionKanade bằng cách tham gia khảo sát ngắn dưới đây nhé!
+          </p>
+          <a
+            href="https://forms.gle/2qmjKA4XGYSXz5rz6"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105 hover:shadow-xl"
+          >
+            Tham gia khảo sát
+          </a>
+        </div>
       </section>
 
       {/* Features Section */}
