@@ -191,7 +191,7 @@ const CaptionBuilder: React.FC = () => {
             />
           )}
 
-          {!captionUser.isMember && !iconUrl && (remainingIconQuota > 0) && (
+          {captionUser.isMember && !iconUrl && (remainingIconQuota > 0) && (
             <IconUpload
             iconFile={iconFile}
             iconPreview={iconPreview}
@@ -206,20 +206,17 @@ const CaptionBuilder: React.FC = () => {
             )}
 
           {/* Non-member notice */}
-          {captionUser.isMember && (
+          {!captionUser.isMember && (
             <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-2xl p-6 border border-yellow-200 dark:border-yellow-700">
               <div className="flex items-center gap-2 mb-2">
                 <Crown className="text-yellow-500" size={20} />
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Tính năng Premium
+                  Đang bảo trì 
                 </h3>
               </div>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Chỉ thành viên mới được thêm icon riêng cho caption.
+                Icon upload đang bảo trì, hãy dùng url upload nhé.
               </p>
-              <button className="px-4 py-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-lg font-semibold hover:from-yellow-600 hover:to-orange-600 transition-all">
-                Nâng cấp ngay
-              </button>
             </div>
           )}
 
