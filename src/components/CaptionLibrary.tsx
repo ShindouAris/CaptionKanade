@@ -3,6 +3,8 @@ import { Search, Filter, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCaptions } from '../contexts/CaptionContext';
 import { useAuth } from '../contexts/AuthContext';
 import { CaptionItem } from './captionUI/CaptionItem';
+import DeleteConfirmationDialog from './captionUI/DeleteConfirmationDialog';
+import toast from 'react-hot-toast';
 
 const CaptionLibrary: React.FC = () => {
   const { 
@@ -24,6 +26,15 @@ const CaptionLibrary: React.FC = () => {
   const { user } = useAuth();
   const [showFilters, setShowFilters] = useState(false);
   const [searchInput, setSearchInput] = useState('');
+  const [deleteDialog, setDeleteDialog] = useState<{
+    isOpen: boolean;
+    captionId: string | null;
+    isLoading: boolean;
+  }>({
+    isOpen: false,
+    captionId: null,
+    isLoading: false,
+  });
 
   // Tính toán tổng số trang
   const totalPages = Math.ceil(totalCaptions / pageSize);
@@ -74,15 +85,45 @@ const CaptionLibrary: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Bạn có chắc muốn xóa caption này?')) {
-      await deleteCaption(id);
+    setDeleteDialog({
+      isOpen: true,
+      captionId: id,
+      isLoading: false,
+    });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteDialog.captionId) return;
+    
+    setDeleteDialog(prev => ({ ...prev, isLoading: true }));
+    
+    try {
+      await deleteCaption(deleteDialog.captionId);
       // Nếu xóa caption cuối cùng của trang, load trang trước đó
       if (filteredCaptions.length === 1 && currentPage > 1) {
         fetchCaptions(currentPage - 1);
       } else {
         fetchCaptions(currentPage);
       }
+    } catch (error) {
+      console.error('Lỗi khi xóa caption:', error);
+      toast.error("Không thể xóa caption này...")
+    } finally {
+      setDeleteDialog({
+        isOpen: false,
+        captionId: null,
+        isLoading: false,
+      });
+      toast.success("Xóa caption thành công!")
     }
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialog({
+      isOpen: false,
+      captionId: null,
+      isLoading: false,
+    });
   };
 
   return (
@@ -292,6 +333,18 @@ const CaptionLibrary: React.FC = () => {
           )}
         </>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={closeDeleteDialog}
+        onConfirm={confirmDelete}
+        title="Xóa Caption"
+        description="Bạn có chắc chắn muốn xóa caption này? Hành động này không thể hoàn tác."
+        confirmText="Xóa Caption"
+        cancelText="Hủy"
+        isLoading={deleteDialog.isLoading}
+      />
     </div>
   );
 };
