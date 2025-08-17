@@ -169,7 +169,9 @@ export const IconUrlUpload: React.FC<IconUrlUploadProps> = React.memo(
             <div className="text-xs text-gray-500 dark:text-gray-400">
               • Chỉ chấp nhận URL ảnh trực tiếp với định dạng .gif, .png, .jpg, .jpeg, .webp<br />
               • Tỷ lệ vuông (1:1) được khuyến nghị<br />
-              • URL phải là link ảnh trực tiếp, không phải trang web chứa ảnh
+              • URL phải là link ảnh trực tiếp, không phải trang web chứa ảnh<br />
+              • Link ảnh phải sống liên tục nếu muốn ảnh hiển thị trong locket<br />
+              • Up ảnh chết lưu rồi thì phải xóa<br />
             </div>
           </div>
         </div>
