@@ -146,26 +146,28 @@ export const CaptionItem: React.FC<CaptionProps> = ({
 
           {/* Right side - Actions */}
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => toggleFavorite(caption.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
-                caption.is_favorite
-                  ? 'bg-gradient-to-r from-pink-500 to-red-500 text-white shadow-lg shadow-pink-500/25 hover:shadow-pink-500/40'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:scale-105'
-              }`}
-            >
-              {caption.is_favorite ? (
-                <>
-                  <FaHeart size={14} />
-                  <span>Đã lưu</span>
-                </>
-              ) : (
-                <>
-                  <Heart size={14} />
-                  <span>Lưu</span>
-                </>
-              )}
-            </button>
+            {user && (
+              <button
+                onClick={() => toggleFavorite(caption.id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
+                  caption.is_favorite
+                    ? 'bg-gradient-to-r from-pink-500 to-red-500 text-white shadow-lg shadow-pink-500/25 hover:shadow-pink-500/40'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:scale-105'
+                }`}
+              >
+                {caption.is_favorite ? (
+                  <>
+                    <FaHeart size={14} />
+                    <span>Đã lưu</span>
+                  </>
+                ) : (
+                  <>
+                    <Heart size={14} />
+                    <span>Lưu</span>
+                  </>
+                )}
+              </button>
+            )}
 
             {caption.author === user?.id && (
               <button
