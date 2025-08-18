@@ -111,12 +111,12 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Fetch user quota from backend
   const fetchUserQuota = useCallback(async () => {
-    if (!authUser) return;
+    if (!authUser || !token) return;
     try {
       const response = await fetch(`${API_URL}/v1/member/get-upload-stat-today`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ user_id: authUser.id })
@@ -132,7 +132,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } catch (error) {
       // optional logging
     }
-  }, [authUser]);
+  }, [authUser, token]);
 
   // Load local favorites on mount for no-auth users
   useEffect(() => {
@@ -153,17 +153,17 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Gọi fetchUserQuota khi user login hoặc vào trang builder
   useEffect(() => {
-    if (authUser) {
+    if (authUser && token) {
       fetchUserQuota();
     }
-  }, [authUser, fetchUserQuota]);
+  }, [authUser, token, fetchUserQuota]);
 
   // Fetch captions when on library page (public access allowed)
   useEffect(() => {
     if (location.pathname === '/library') {
       fetchCaptions(1);
     }
-  }, [location.pathname]);
+  }, [location.pathname, token]);
 
   const fetchCaptions = async (page: number) => {
     setIsLoading(true);
@@ -224,9 +224,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       const response = await fetch(`${API_URL}/captions/create`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-        },
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
         body: formData
       });
 
@@ -252,9 +250,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     try {
       const response = await fetch(`${API_URL}/captions/delete/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-        }
+        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
       });
 
       if (response.ok) {
