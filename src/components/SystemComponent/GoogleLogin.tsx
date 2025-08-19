@@ -22,6 +22,7 @@ export const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
 }) => {
   return (
     <Button
+      type="button"
       onClick={onClick}
       disabled={disabled || isLoading}
       variant={variant}
