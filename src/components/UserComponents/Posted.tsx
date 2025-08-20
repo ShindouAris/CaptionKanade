@@ -39,9 +39,9 @@ const UserUploaded: React.FC = () => {
 
   // Improved get_posted function
   const getPosted = useCallback(async (reset: boolean = false): Promise<PostsResponse> => {
-    const { user, token } = authContext;
+    const { user, accessToken } = authContext;
     
-    if (!user || !token) {
+    if (!user || !accessToken) {
       throw new Error('User not authenticated');
     }
 
@@ -51,7 +51,7 @@ const UserUploaded: React.FC = () => {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       }
     });
@@ -99,10 +99,10 @@ const UserUploaded: React.FC = () => {
   }, [getPosted, nextToken, loadingMore]);
 
   useEffect(() => {
-    if (authContext.user && authContext.token) {
+    if (authContext.user && authContext.accessToken) {
       loadPosts();
     }
-  }, [authContext.user, authContext.token, loadPosts]);
+  }, [authContext.user, authContext.accessToken, loadPosts]);
 
   // Retry handler
   const handleRetry = () => {

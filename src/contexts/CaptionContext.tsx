@@ -107,16 +107,16 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [localFavorites, setLocalFavorites] = useState<Set<string>>(new Set());
 
   const location = useLocation();
-  const { user: authUser, token, getAuthHeader } = useAuth();
+  const { user: authUser, accessToken, getAuthHeader } = useAuth();
 
   // Fetch user quota from backend
   const fetchUserQuota = useCallback(async () => {
-    if (!authUser || !token) return;
+    if (!authUser || !accessToken) return;
     try {
       const response = await fetch(`${API_URL}/v1/member/get-upload-stat-today`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ user_id: authUser.id })
@@ -132,7 +132,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } catch (error) {
       // optional logging
     }
-  }, [authUser, token]);
+  }, [authUser, accessToken]);
 
   // Load local favorites on mount for no-auth users
   useEffect(() => {
@@ -153,25 +153,25 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   // Gọi fetchUserQuota khi user login hoặc vào trang builder
   useEffect(() => {
-    if (authUser && token) {
+    if (authUser && accessToken) {
       fetchUserQuota();
     }
-  }, [authUser, token, fetchUserQuota]);
+  }, [authUser, accessToken, fetchUserQuota]);
 
   // Fetch captions when on library page (public access allowed)
   useEffect(() => {
     if (location.pathname === '/library') {
       fetchCaptions(1);
     }
-  }, [location.pathname, token]);
+  }, [location.pathname, accessToken]);
 
   const fetchCaptions = async (page: number) => {
     setIsLoading(true);
     setError(null);
     try {
       const headers: Record<string, string> = {};
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+      if (accessToken) {
+        headers['Authorization'] = `Bearer ${accessToken}`;
       }
       const response = await fetch(`${API_URL}/captions/${page}`, { headers });
       if (response.ok) {
@@ -224,7 +224,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       const response = await fetch(`${API_URL}/captions/create`, {
         method: 'POST',
-        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
+        headers: accessToken ? { 'Authorization': `Bearer ${accessToken}` } : undefined,
         body: formData
       });
 
@@ -250,7 +250,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     try {
       const response = await fetch(`${API_URL}/captions/delete/${id}`, {
         method: 'DELETE',
-        headers: token ? { 'Authorization': `Bearer ${token}` } : undefined
+        headers: accessToken ? { 'Authorization': `Bearer ${accessToken}` } : undefined
       });
 
       if (response.ok) {
@@ -268,7 +268,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const isFavorited = current?.is_favorite || false;
 
       // No-auth: toggle locally and skip API; do not change favorite_count
-      if (!authUser || !token) {
+      if (!authUser || !accessToken) {
         const nextSet = new Set(localFavorites);
         if (isFavorited) {
           nextSet.delete(id);
@@ -289,7 +289,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -305,7 +305,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     } catch (error) {
       console.error('Error toggling saved status:', error);
     }
-  }, [captions, authUser, token, localFavorites, persistLocalFavorites]);
+  }, [captions, authUser, accessToken, localFavorites, persistLocalFavorites]);
 
   // Debounced version of toggleFavorite that returns a Promise
   const debouncedToggleFavorite = useCallback(

@@ -25,7 +25,8 @@ interface AuthContextType {
   logout: () => void;
   setUsername: (username: string) => Promise<void>;
   getAuthHeader: () => { Authorization: string } | {};
-  token: string | null;
+  accessToken: string | null;
+  refreshToken: string | null;
   get_posted: () => Promise<void>;
   verifyAccount: (token: string) => Promise<void>;
   submitOtp: (token: string, otp: number) => Promise<void>;
@@ -36,30 +37,41 @@ interface AuthContextType {
 
 // Token utility functions
 class TokenManager {
-  private static readonly TOKEN_KEY = 'auth_token';
+  private static readonly ACCESS_TOKEN_KEY = 'access_token';
+  private static readonly REFRESH_TOKEN_KEY = 'refresh_token';
   private static readonly REFRESH_BUFFER_MS = 5 * 60 * 1000; // 5 minutes
 
-  static getToken(): string | null {
+  static getAccessToken(): string | null {
     try {
-      return localStorage.getItem(this.TOKEN_KEY);
+      return localStorage.getItem(this.ACCESS_TOKEN_KEY);
     } catch {
       return null;
     }
   }
 
-  static setToken(token: string): void {
+  static getRefreshToken(): string | null {
     try {
-      localStorage.setItem(this.TOKEN_KEY, token);
-    } catch (error) {
-      console.error('Failed to store token:', error);
+      return localStorage.getItem(this.REFRESH_TOKEN_KEY);
+    } catch {
+      return null;
     }
   }
 
-  static removeToken(): void {
+  static setTokens(accessToken: string, refreshToken: string): void {
     try {
-      localStorage.removeItem(this.TOKEN_KEY);
+      localStorage.setItem(this.ACCESS_TOKEN_KEY, accessToken);
+      localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
     } catch (error) {
-      console.error('Failed to remove token:', error);
+      console.error('Failed to store tokens:', error);
+    }
+  }
+
+  static removeTokens(): void {
+    try {
+      localStorage.removeItem(this.ACCESS_TOKEN_KEY);
+      localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+    } catch (error) {
+      console.error('Failed to remove tokens:', error);
     }
   }
 
@@ -124,7 +136,8 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState<User | null>(null);
   const [next_token, setNextToken] = useState<string | null>(null);
@@ -133,6 +146,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const refreshTimeoutRef = useRef<number | null>(null);
   const isRefreshingRef = useRef<boolean>(false);
   const refreshPromiseRef = useRef<Promise<void> | null>(null);
+  
+  // Use refs to avoid dependency loops
+  const userRef = useRef<User | null>(null);
+  const accessTokenRef = useRef<string | null>(null);
+  const refreshTokenRef = useRef<string | null>(null);
+
+  // Update refs when state changes
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
+  useEffect(() => {
+    accessTokenRef.current = accessToken;
+  }, [accessToken]);
+
+  useEffect(() => {
+    refreshTokenRef.current = refreshToken;
+  }, [refreshToken]);
 
   // Clear refresh timeout
   const clearRefreshTimeout = useCallback(() => {
@@ -145,30 +176,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Handle authentication state cleanup
   const clearAuthState = useCallback(() => {
     setUser(null);
-    setToken(null);
-    setUserInfo(null);
-    TokenManager.removeToken();
+    setAccessToken(null);
+    setRefreshToken(null);
+    TokenManager.removeTokens();
     clearRefreshTimeout();
     isRefreshingRef.current = false;
     refreshPromiseRef.current = null;
   }, [clearRefreshTimeout]);
 
-  // Update user state from token
-  const updateUserFromToken = useCallback((newToken: string) => {
-    const payload = TokenManager.parseTokenPayload(newToken);
+  // Update user state from access token
+  const updateUserFromToken = useCallback((newAccessToken: string) => {
+    const payload = TokenManager.parseTokenPayload(newAccessToken);
     const newUser = TokenManager.createUserFromPayload(payload);
     
     if (newUser) {
       setUser(newUser);
-      setToken(newToken);
-      TokenManager.setToken(newToken);
+      setAccessToken(newAccessToken);
       return true;
     }
     return false;
   }, []);
 
   // Refresh token function
-  const refreshToken = useCallback(async (): Promise<void> => {
+  const refreshAccessToken = useCallback(async (): Promise<void> => {
     // Prevent multiple concurrent refresh attempts
     if (isRefreshingRef.current && refreshPromiseRef.current) {
       return refreshPromiseRef.current;
@@ -178,15 +208,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     const refreshPromise = (async () => {
       try {
-        const currentToken = TokenManager.getToken();
+        const currentRefreshToken = TokenManager.getRefreshToken();
         
-        if (!currentToken) {
-          throw new Error('No token found');
-        }
-
-        const payload = TokenManager.parseTokenPayload(currentToken);
-        if (!payload?.id) {
-          throw new Error('Invalid token payload');
+        if (!currentRefreshToken) {
+          throw new Error('No refresh token found');
         }
 
         const response = await fetch(`${API_URL}/v1/user/refresh_token`, {
@@ -195,8 +220,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            token: currentToken,
-            account_id: payload.id
+            refresh_token: currentRefreshToken
           })
         });
 
@@ -206,18 +230,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         const data = await response.json();
         
-        if (!data.token) {
-          throw new Error('No token in refresh response');
+        if (!data.access_token) {
+          throw new Error('No access token in refresh response');
         }
 
-        // Update auth state with new token
-        const success = updateUserFromToken(data.token);
-        if (!success) {
-          throw new Error('Failed to update user from refreshed token');
+        // Update tokens
+        setAccessToken(data.access_token);
+        if (data.refresh_token) {
+          setRefreshToken(data.refresh_token);
+          TokenManager.setTokens(data.access_token, data.refresh_token);
+        } else {
+          TokenManager.setTokens(data.access_token, currentRefreshToken);
+        }
+
+        // Update user state if needed - use ref to avoid dependency
+        if (!userRef.current) {
+          updateUserFromToken(data.access_token);
         }
 
         // Schedule next refresh
-        scheduleTokenRefresh(data.token);
+        scheduleTokenRefresh(data.access_token);
         
       } catch (error) {
         console.error('Token refresh failed:', error);
@@ -235,17 +267,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Schedule token refresh
   const scheduleTokenRefresh = useCallback((tokenToCheck: string | null = null) => {
-    const targetToken = tokenToCheck || TokenManager.getToken();
+    const targetToken = tokenToCheck || TokenManager.getAccessToken();
     
     if (!targetToken || TokenManager.isTokenExpired(targetToken)) {
+      // Try to refresh if we have a refresh token
+      if (TokenManager.getRefreshToken()) {
+        refreshAccessToken().catch(() => {
+          // Error handling is done in refreshAccessToken
+        });
+        return;
+      }
       clearAuthState();
       return;
     }
 
     if (TokenManager.shouldRefreshToken(targetToken)) {
       // Token needs immediate refresh
-      refreshToken().catch(() => {
-        // Error handling is done in refreshToken
+      refreshAccessToken().catch(() => {
+        // Error handling is done in refreshAccessToken
       });
       return;
     }
@@ -257,34 +296,50 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (timeUntilRefresh > 0) {
       refreshTimeoutRef.current = window.setTimeout(() => {
-        refreshToken().catch(() => {
-          // Error handling is done in refreshToken
+        refreshAccessToken().catch(() => {
+          // Error handling is done in refreshAccessToken
         });
       }, timeUntilRefresh);
     }
-  }, [refreshToken, clearAuthState, clearRefreshTimeout]);
+  }, [refreshAccessToken, clearAuthState, clearRefreshTimeout]);
 
   // Initialize auth state on mount
   useEffect(() => {
     const initializeAuth = () => {
-      const savedToken = TokenManager.getToken();
-      // const token_payload = TokenManager.parseTokenPayload(savedToken);
-      // const current_time = new Date();
-      // const expired_at = new Date(token_payload.exp * 1000);
-      // console.log(`Token expired at: ${expired_at}`)
-      // console.log(`Current time: ${current_time}`)
-      // console.log(`Time until refresh: ${Math.floor((expired_at.getTime() - current_time.getTime()) / 1000)}s`)
-      if (savedToken && !TokenManager.isTokenExpired(savedToken)) {
-        const success = updateUserFromToken(savedToken);
+      const savedAccessToken = TokenManager.getAccessToken();
+      const savedRefreshToken = TokenManager.getRefreshToken();
+      
+      if (savedAccessToken && !TokenManager.isTokenExpired(savedAccessToken)) {
+        const success = updateUserFromToken(savedAccessToken);
         if (success) {
-          scheduleTokenRefresh(savedToken);
+          setAccessToken(savedAccessToken);
+          setRefreshToken(savedRefreshToken);
+          scheduleTokenRefresh(savedAccessToken);
         } else {
           toast.error("Làm mới session thất bại, vui lòng đăng nhập lại")
           clearAuthState();
         }
-      } else if (savedToken) {
-        // Token exists but is expired 
-        // mất dạy
+      } else if (savedRefreshToken && savedAccessToken) {
+        // Access token expired but refresh token exists, try to refresh
+        refreshAccessToken().catch(() => {
+          toast.error("Phiên đã hết hạn, vui lòng đăng nhập lại", {
+            icon: <LogOutIcon />,
+            duration: 4000,
+            style: {
+              borderRadius: "12px",
+              background: "#fff1f2",
+              color: "#b91c1c",
+              fontWeight: 500,
+            },
+            iconTheme: {
+              primary: "#ef4444",
+              secondary: "#fff",
+            },
+          });
+          clearAuthState();
+        });
+      } else if (savedAccessToken) {
+        // Only access token exists but is expired, no refresh token
         toast.error("Phiên đã hết hạn, vui lòng đăng nhập lại", {
           icon: <LogOutIcon />,
           duration: 4000,
@@ -298,8 +353,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             primary: "#ef4444",
             secondary: "#fff",
           },
-        })
-        TokenManager.removeToken();
+        });
+        TokenManager.removeTokens();
       }
       
       setLoading(false);
@@ -311,7 +366,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       clearRefreshTimeout();
     };
-  }, [updateUserFromToken, scheduleTokenRefresh, clearAuthState, clearRefreshTimeout]);
+  }, [updateUserFromToken, scheduleTokenRefresh, clearAuthState, clearRefreshTimeout, refreshAccessToken]);
 
   // Login function
   const login = async (email: string, password: string, turnstileToken?: string) => {
@@ -334,16 +389,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error(data.detail || 'Đăng nhập thất bại');
       }
 
-      if (!data.data?.token) {
+      if (!data.data?.access_token || !data.data?.refresh_token) {
         throw new Error('Không nhận được token từ server');
       }
 
-      const success = updateUserFromToken(data.data.token);
+      const success = updateUserFromToken(data.data.access_token);
       if (!success) {
         throw new Error('Token không hợp lệ');
       }
 
-      scheduleTokenRefresh(data.data.token);
+      // Store both tokens
+      setRefreshToken(data.data.refresh_token);
+      TokenManager.setTokens(data.data.access_token, data.data.refresh_token);
+      scheduleTokenRefresh(data.data.access_token);
       
     } catch (error) {
       clearAuthState();
@@ -364,12 +422,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const response = await GoogleAuthService.authenticateWithGoogle(accesstoken);
       
-      const success = updateUserFromToken(response.data.token);
+      if (!response.data?.access_token || !response.data?.refresh_token) {
+        throw new Error('Không nhận được token từ server');
+      }
+
+      const success = updateUserFromToken(response.data.access_token);
       if (!success) {
         throw new Error('Token trả về từ server không hợp lệ');
       }
 
-      scheduleTokenRefresh(response.data.token);
+      // Store both tokens
+      setRefreshToken(response.data.refresh_token);
+      TokenManager.setTokens(response.data.access_token, response.data.refresh_token);
+      scheduleTokenRefresh(response.data.access_token);
 
     } catch (error) {
       // Re-throw error để component có thể xử lý
@@ -410,7 +475,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const response = await fetch(`${API_URL}/v1/member/get-user-data`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -423,13 +488,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const get_posted = async () => {
-    if (!user || !token) {
+    if (!user || !accessToken) {
       throw new Error('User not authenticated');
     }
     const response = await fetch(`${API_URL}/v1/member/posts${next_token ? `?next_token=${next_token}` : ''}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       }
     });
@@ -442,14 +507,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const setUsername = async (username: string) => {
-    if (!user || !token) {
+    if (!user || !accessToken) {
       throw new Error('User not authenticated');
     }
     
     const response = await fetch(`${API_URL}/v1/member/change_username`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Authorization': `Bearer ${accessToken}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ username })
@@ -472,8 +537,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const getAuthHeader = () => {
-    return token ? { 
-      'Authorization': `Bearer ${token}`,
+    return accessToken ? { 
+      'Authorization': `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     } : {
@@ -542,7 +607,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logout,
     get_posted,
     getAuthHeader,
-    token,
+    accessToken,
+    refreshToken,
     userInfo,
     verifyAccount,
     submitOtp,

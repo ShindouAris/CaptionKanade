@@ -3,8 +3,11 @@ const API_URL = import.meta.env.VITE_API_URL;
 export interface GoogleAuthResponse {
   status: string;
   data: {
-    token: string;
-    user: {
+    access_token: string;
+    refresh_token: string;
+    token_type: string;
+    ttl: number;
+    user?: {
       id: string;
       email: string;
       username: string;
