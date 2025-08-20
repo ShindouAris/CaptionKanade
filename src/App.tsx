@@ -123,7 +123,7 @@ const SidebarContent: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) =
                   </Avatar>
                   <div className="flex flex-col items-start">
                     <span className="text-sm font-medium">
-                      {user.username ? `@${user.username}` : user.email}
+                      {user.username ? `@${user.username}` : user.email.slice(0, 20)}
                     </span>
                     <div className="flex items-center gap-[5px]">
                       {user.is_verified && (
