@@ -8,9 +8,10 @@ interface CaptionUploadSuccessProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   caption: Caption | null;
+  is_private: boolean
 }
 
-export const CaptionUploadSuccess: React.FC<CaptionUploadSuccessProps> = ({ open, onOpenChange, caption }) => {
+export const CaptionUploadSuccess: React.FC<CaptionUploadSuccessProps> = ({ open, onOpenChange, caption, is_private }) => {
   const handleCopyId = async () => {
     if (!caption?.id) return;
     try {
@@ -75,12 +76,21 @@ export const CaptionUploadSuccess: React.FC<CaptionUploadSuccessProps> = ({ open
             >
               Đóng
             </button>
+            {is_private ? <a
+              href="/userprofile"
+              className="px-4 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold hover:from-pink-600 hover:to-purple-700 transition"
+            >
+              Xem profile
+            </a> 
+            : 
             <a
               href="/library"
               className="px-4 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold hover:from-pink-600 hover:to-purple-700 transition"
             >
               Xem thư viện
             </a>
+            }
+            
           </div>
         </div>
       </DialogContent>

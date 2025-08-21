@@ -207,6 +207,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       formData.append('colorbottom', newCaption.colorbottom);
       formData.append('author', newCaption.author);
       formData.append('type', newCaption.type);
+      formData.append('is_private', String(newCaption.is_private ?? false));
 
       if (newCaption.tags && newCaption.tags.length > 0) {
         formData.append('tags', JSON.stringify(newCaption.tags));

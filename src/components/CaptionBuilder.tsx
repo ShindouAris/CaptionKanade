@@ -13,6 +13,7 @@ import { IconUpload } from './captionUI/IconUpload';
 import { Preview } from './captionUI/Preview';
 import { CaptionUploadSuccess } from './captionUI/CaptionUploadSuccess';
 import {IconUrlUpload} from './captionUI/IconUrlUpload';
+import { UploadConfig } from './captionUI/UploadConfig';
 
 
 const CaptionBuilder: React.FC = () => {
@@ -32,6 +33,7 @@ const CaptionBuilder: React.FC = () => {
   const [showUploadSuccess, setShowUploadSuccess] = useState(false);
   const [uploadedCaption, setUploadedCaption] = useState<Caption | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isPrivate, setisPrivate] = useState(false)
 
   const gradientPresets = [
     { top: '#FFDEE9', bottom: '#B5FFFC', name: 'Pastel Dream' },
@@ -129,7 +131,8 @@ const CaptionBuilder: React.FC = () => {
         color: selectedColor,
         colortop: selectedColorTop,
         colorbottom: selectedColorBottom,
-        is_favorite: false
+        is_favorite: false,
+        is_private: isPrivate
       };
       const saved = await addCaption(captionData);
       setUploadedCaption(saved);
@@ -298,6 +301,10 @@ const CaptionBuilder: React.FC = () => {
               )}
             </button>
           </div>
+          <UploadConfig 
+            isPrivate={isPrivate}
+            onPrivacyChange={setisPrivate}
+          />
           <div className="flex justify-center items-center gap-2 text-xs sm:text-sm text-gray-700 dark:text-gray-300 text-center">
             <div
               className="rounded-lg px-2 sm:px-4 py-2 shadow-sm font-bold text-xs sm:text-sm"
@@ -317,6 +324,7 @@ const CaptionBuilder: React.FC = () => {
       <canvas ref={canvasRef} className="hidden" />
 
       <CaptionUploadSuccess
+        is_private={isPrivate}
         open={showUploadSuccess}
         onOpenChange={setShowUploadSuccess}
         caption={uploadedCaption}

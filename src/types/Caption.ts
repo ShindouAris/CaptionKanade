@@ -15,6 +15,7 @@ export interface Caption {
   favorite_count?: number;
   is_favorite?: boolean;
   is_popular?: boolean;
+  is_private?: boolean;
 }
 
 export interface CaptionCreateForm {

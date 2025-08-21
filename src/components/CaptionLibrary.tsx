@@ -196,7 +196,7 @@ const CaptionLibrary: React.FC = () => {
           Thư viện Caption
         </h2>
         <p className="dark:text-gray-300">
-          Quản lý và tìm kiếm trong {totalCaptions} caption của bạn
+          Quản lý và tìm kiếm trong {totalCaptions} caption trên toàn hệ thống
         </p>
       </div>
 
