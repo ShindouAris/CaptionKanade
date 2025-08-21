@@ -25,13 +25,10 @@ export const UploadConfig: React.FC<UploadConfigProps> = ({
           </div>
           <div>
             <h3 className="text-sm font-medium dark:text-white">
-              {isPrivate ? 'Đăng riêng tư' : 'Đăng công khai'}
+              Đăng riêng tư
             </h3>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              {isPrivate 
-                ? 'Chỉ bạn có thể xem và chia sẻ caption này'
-                : 'Mọi người có thể xem và sử dụng caption này'
-              }
+              Khi kích hoạt lựa chọn này, chỉ bạn có thể xem và chia sẻ caption đã đăng
             </p>
           </div>
         </div>
