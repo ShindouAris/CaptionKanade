@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Mail, Lock, Loader2, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
@@ -16,8 +16,14 @@ const Register: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register, user } = useAuth();
   const { googleLogin, isGoogleLoading } = useGoogleAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/")
+    }
+  }, [user])
 
   const siteKey = import.meta.env.VITE_TURNSTILE_PUBLICKEY;
 
