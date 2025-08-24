@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, Home, Edit3, BookOpen, Moon, Sun, LogOut, HelpCircle } from 'lucide-react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { MdOutlineCollectionsBookmark } from "react-icons/md";
 import HomePage from './components/HomePage';
 import CaptionBuilder from './components/CaptionBuilder';
 import CaptionLibrary from './components/CaptionLibrary';
@@ -61,6 +62,10 @@ const SidebarContent: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) =
     { id: '/tutorial', label: 'Hướng dẫn', icon: HelpCircle },
   ];
 
+  const beta_page: NavigationItem[] = [
+    {id: '#', label: "Quản lý bộ sưu tập", icon: MdOutlineCollectionsBookmark}
+  ]
+
   const getUserInitials = (user: any) => {
     if (user?.username) {
       return user.username.slice(0, 2).toUpperCase();
@@ -104,6 +109,35 @@ const SidebarContent: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) =
           ))}
         </div>
       </nav>
+
+      {/* Beta Pages - Đang phát triển */}
+      <div className="px-4 mt-2 mb-2">
+        <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+          Tính năng thử nghiệm
+        </div>
+        <div className="space-y-1">
+          {beta_page.map(({ id, label, icon: Icon }) => (
+            <Button
+              key={id}
+              disabled
+              variant="ghost"
+              className={cn(
+                "w-full justify-start h-12 px-4 cursor-not-allowed bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border border-gray-200 dark:border-gray-700",
+                "hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-400 dark:hover:text-gray-500"
+              )}
+              style={{
+                pointerEvents: "none"
+              }}
+              asChild
+            >
+              <span>
+                <Icon className="mr-3 h-5 w-5" />
+                {label}
+              </span>
+            </Button>
+          ))}
+        </div>
+      </div>
 
       <Separator />
 
