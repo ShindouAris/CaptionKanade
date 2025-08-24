@@ -369,7 +369,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [updateUserFromToken, scheduleTokenRefresh, clearAuthState, clearRefreshTimeout, refreshAccessToken]);
 
   // Login function
-  const login = async (email: string, password: string, turnstileToken?: string) => {
+  const login = useCallback(async (email: string, password: string, turnstileToken?: string) => {
     setLoading(true);
     try {
       const response = await fetch(`${API_URL}/v1/user/login`, {
@@ -409,9 +409,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setLoading(false);
     }
-  };
+  }, [updateUserFromToken, scheduleTokenRefresh, clearAuthState]);
 
-  const googleauth = async (accesstoken: string) => {
+  const googleauth = useCallback(async (accesstoken: string) => {
     setLoading(true);
     try {
       // Validate Google token trước khi gửi lên server
@@ -442,9 +442,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setLoading(false);
     }
-  };
+  }, [updateUserFromToken, scheduleTokenRefresh]);
 
-  const register = async (email: string, password: string, turnstileToken?: string) => {
+  const register = useCallback(async (email: string, password: string, turnstileToken?: string) => {
     setLoading(true);
     try {
       const response = await fetch(`${API_URL}/v1/user/register`, {
@@ -465,13 +465,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setLoading(false);
     }
-  };
+  }, [login]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     clearAuthState();
-  };
+  }, [clearAuthState]);
 
-  const getUserInfo = async () => {
+  const getUserInfo = useCallback(async () => {
+    if (!accessToken || !user?.id) {
+      throw new Error('User not authenticated');
+    }
+    
     const response = await fetch(`${API_URL}/v1/member/get-user-data`, {
       method: 'POST',
       headers: {
@@ -479,15 +483,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        user_id: user?.id
+        user_id: user.id
       })
     });
     const data = await response.json();
     setUserInfo(data);
     return data;
-  };
+  }, [accessToken, user?.id]);
 
-  const get_posted = async () => {
+  const get_posted = useCallback(async () => {
     if (!user || !accessToken) {
       throw new Error('User not authenticated');
     }
@@ -504,9 +508,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const data = await response.json();
     setNextToken(data.next_token || null);
     return data;
-  };
+  }, [user, accessToken, next_token]);
 
-  const setUsername = async (username: string) => {
+  const setUsername = useCallback(async (username: string) => {
     if (!user || !accessToken) {
       throw new Error('User not authenticated');
     }
@@ -534,9 +538,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         };
       });
     }
-  };
+  }, [user, accessToken]);
 
-  const getAuthHeader = () => {
+  const getAuthHeader = useCallback(() => {
     return accessToken ? { 
       'Authorization': `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
@@ -545,9 +549,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     };
-  };
+  }, [accessToken]);
 
-  const verifyAccount = async (token: string) => {
+  const verifyAccount = useCallback(async (token: string) => {
     setLoading(true);
     try {
       const response = await fetch(`${API_URL}/v1/user/verify_account`, {
@@ -567,9 +571,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const submitOtp = async (token: string, otp: number) => {
+  const submitOtp = useCallback(async (token: string, otp: number) => {
     setLoading(true);
     try {
       const response = await fetch(`${API_URL}/v1/user/submit_otp`, {
@@ -595,7 +599,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const value = {
     user,

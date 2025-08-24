@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Mail, Calendar, Hash, Clock, CheckCircle2, XCircle, RefreshCw } from 'lucide-react';
 import { FaDev } from "react-icons/fa";
@@ -175,10 +175,14 @@ const UserPage: React.FC = () => {
 
   // Fetch user info on mount
   useEffect(() => {
-    handleRefresh();
-  }, []);
+    if (authUser && authUser.id) {
+      handleRefresh();
+    }
+  }, [authUser?.id]); // Only run when user ID changes
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
+    if (!authUser?.id) return;
+    
     setIsRefreshing(true);
     try {
       const data = await getUserInfo();
@@ -205,7 +209,7 @@ const UserPage: React.FC = () => {
     } finally {
       setIsRefreshing(false);
     }
-  };
+  }, [authUser?.id, getUserInfo]);
 
   if (!authUser || !userInfo) {
     return (

@@ -37,16 +37,15 @@ const UserUploaded: React.FC = () => {
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const { toggleFavorite, deleteCaption,} = useCaptions();
 
-  // Improved get_posted function
-  const getPosted = useCallback(async (reset: boolean = false): Promise<PostsResponse> => {
+  // Fixed get_posted function - removed nextToken dependency to prevent infinite loops
+  const getPosted = useCallback(async (token: string | null = null): Promise<PostsResponse> => {
     const { user, accessToken } = authContext;
     
     if (!user || !accessToken) {
       throw new Error('User not authenticated');
     }
 
-    const tokenToUse = reset ? null : nextToken;
-    const url = `${API_URL}/v1/member/posts${tokenToUse ? `?next_token=${tokenToUse}` : ''}`;
+    const url = `${API_URL}/v1/member/posts${token ? `?next_token=${token}` : ''}`;
     
     const response = await fetch(url, {
       method: 'GET',
@@ -63,14 +62,14 @@ const UserUploaded: React.FC = () => {
 
     const data: PostsResponse = await response.json();
     return data;
-  }, [authContext, nextToken]);
+  }, [authContext.user, authContext.accessToken]);
 
   // Load initial posts
   const loadPosts = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getPosted(true);
+      const data = await getPosted(null); // Always start fresh
       setPosts(data.captions || []);
       setNextToken(data.next_token || null);
     } catch (err) {
@@ -87,7 +86,7 @@ const UserUploaded: React.FC = () => {
 
     try {
       setLoadingMore(true);
-      const data = await getPosted(false);
+      const data = await getPosted(nextToken);
       setPosts(prev => [...prev, ...(data.captions || [])]);
       setNextToken(data.next_token || null);
     } catch (err) {
@@ -98,11 +97,12 @@ const UserUploaded: React.FC = () => {
     }
   }, [getPosted, nextToken, loadingMore]);
 
+  // Only load posts when user or accessToken changes, not when loadPosts changes
   useEffect(() => {
     if (authContext.user && authContext.accessToken) {
       loadPosts();
     }
-  }, [authContext.user, authContext.accessToken, loadPosts]);
+  }, [authContext.user, authContext.accessToken]); // Removed loadPosts dependency
 
   // Retry handler
   const handleRetry = () => {
