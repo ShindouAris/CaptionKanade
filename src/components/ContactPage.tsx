@@ -42,6 +42,16 @@ const ContactPage: React.FC = () => {
                   <p className="text-gray-600 dark:text-gray-300">8:00 - 23:00 (GMT+7)</p>
                 </div>
               </div>
+
+              <div className="flex justify-center items-center gap-3 p-3 rounded-lg bg-indigo-50 dark:bg-gray-700">
+                <a href="https://discord.com/users/867040792463802389" className="flex justify-center items-center w-full">
+                  <img 
+                    src="https://lanyard.cnrad.dev/api/867040792463802389?animated=false&bg=ffdcff&theme=light&showDisplayName=true&hideSpotify=true&idleMessage=%C4%90ang%20r%E1%BA%A3nh%20n%C3%A8%20%3AD" 
+                    className="mx-auto"
+                  />
+                </a>
+              </div>
+
             </div>
           </div>
 
