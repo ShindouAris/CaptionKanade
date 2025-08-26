@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Home, Edit3, BookOpen, Moon, Sun, LogOut, HelpCircle, MessageCircle } from 'lucide-react';
+import { Menu, Home, Edit3, BookOpen, Moon, Sun, LogOut, HelpCircle, MessageCircle, Flame } from 'lucide-react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { MdOutlineCollectionsBookmark } from "react-icons/md";
 import HomePage from './components/HomePage';
 import CaptionBuilder from './components/CaptionBuilder';
 import CaptionLibrary from './components/CaptionLibrary';
 import Tutorial from './components/Tutorial';
+import Trending from './components/Trending';
 import ContactPage from './components/ContactPage';
 import Login from './components/Login';
 import Register from './components/Register';
@@ -60,6 +61,7 @@ const SidebarContent: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) =
     { id: '/', label: 'Home', icon: Home },
     { id: '/builder', label: 'Caption Studio', icon: Edit3 },
     { id: '/library', label: 'Library', icon: BookOpen },
+    { id: '/trending', label: 'Trending', icon: Flame },
     { id: '/tutorial', label: 'Hướng dẫn', icon: HelpCircle },
     { id: '/contact', label: 'Liên hệ', icon: MessageCircle },
   ];
@@ -380,6 +382,9 @@ const App: React.FC = () => {
               
               <Route path="/library" element={
                   <CaptionLibrary />
+              } />
+              <Route path="/trending" element={
+                  <Trending />
               } />
               
               <Route path="/tutorial" element={

@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Search, Filter, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { Search, Filter, Tag } from 'lucide-react';
 import { useCaptions } from '../contexts/CaptionContext';
 import { useAuth } from '../contexts/AuthContext';
 import { CaptionItem } from './captionUI/CaptionItem';
@@ -11,7 +11,6 @@ const CaptionLibrary: React.FC = () => {
     filteredCaptions,
     totalCaptions,
     currentPage,
-    pageSize,
     isLoading,
     error,
     filter, 
@@ -22,6 +21,8 @@ const CaptionLibrary: React.FC = () => {
     fetchCaptions,
     searchCaptions,
     clearSearch,
+    hasMore,
+    loadMore,
   } = useCaptions();
   const { user } = useAuth();
   const [showFilters, setShowFilters] = useState(false);
@@ -36,80 +37,7 @@ const CaptionLibrary: React.FC = () => {
     isLoading: false,
   });
 
-  // Tính toán tổng số trang
-  const totalPages = Math.ceil(totalCaptions / pageSize);
-
-  // Xử lý chuyển trang
-  const handlePageChange = (pageNumber: number) => {
-    if (filter.searchQuery) {
-      searchCaptions(filter.searchQuery, pageNumber);
-    } else {
-      fetchCaptions(pageNumber);
-    }
-  };
-
-  // Responsive: số lượng nút trang hiển thị theo viewport
-  const [maxVisiblePages, setMaxVisiblePages] = useState(5);
-
-  useEffect(() => {
-    const updateMaxVisiblePages = () => {
-      const width = window.innerWidth;
-      if (width < 640) {
-        setMaxVisiblePages(3); // mobile
-      } else if (width < 1024) {
-        setMaxVisiblePages(5); // tablet
-      } else {
-        setMaxVisiblePages(7); // desktop
-      }
-    };
-    updateMaxVisiblePages();
-    window.addEventListener('resize', updateMaxVisiblePages);
-    return () => window.removeEventListener('resize', updateMaxVisiblePages);
-  }, []);
-
-  // Tạo danh sách các item phân trang (số trang và dấu …)
-  const getPaginationItems = (
-    current: number,
-    total: number,
-    maxLength: number
-  ): (number | 'ellipsis')[] => {
-    if (total <= maxLength) {
-      return Array.from({ length: total }, (_, i) => i + 1);
-    }
-
-    const items: (number | 'ellipsis')[] = [];
-    const half = Math.floor(maxLength / 2);
-    let start = Math.max(1, current - half);
-    let end = Math.min(total, current + half);
-
-    // Điều chỉnh để luôn đủ maxLength khi có thể
-    if (end - start + 1 < maxLength) {
-      if (start === 1) {
-        end = Math.min(total, start + maxLength - 1);
-      } else if (end === total) {
-        start = Math.max(1, end - maxLength - 1 + 2); // +2 để bù biên
-      }
-    }
-
-    if (start > 1) {
-      items.push(1);
-      if (start > 2) items.push('ellipsis');
-    }
-
-    for (let i = start; i <= end; i++) items.push(i);
-
-    if (end < total) {
-      if (end < total - 1) items.push('ellipsis');
-      items.push(total);
-    }
-
-    return items;
-  };
-
-  const paginationItems = useMemo(
-    () => getPaginationItems(currentPage, totalPages, Math.min(maxVisiblePages, totalPages)),
-    [currentPage, totalPages, maxVisiblePages]
-  );
+  // Phân trang cũ đã bỏ, sử dụng next_token: fetchCaptions(1) cho lần đầu, loadMore cho tải thêm
 
   const handleSearch = () => {
     setFilter({ searchQuery: searchInput });
@@ -144,7 +72,7 @@ const CaptionLibrary: React.FC = () => {
 
   const handleSort = (sortBy: 'newest' | 'oldest' | 'popular') => {
     setFilter({ sortBy });
-    fetchCaptions(1); // Reset về trang 1 khi sort
+    fetchCaptions(1);
   };
 
   const handleDelete = async (id: string) => {
@@ -295,7 +223,7 @@ const CaptionLibrary: React.FC = () => {
       </div>
 
       {/* Loading State */}
-      {isLoading && (
+      {isLoading && filteredCaptions.length === 0 && (
         <div className="text-center py-12">
           <img src='/preload.gif' className='h-48 mx-auto' alt='loading' />
           <p className="text-gray-600 dark:text-gray-300">Đang tải dữ liệu...</p>
@@ -347,7 +275,7 @@ const CaptionLibrary: React.FC = () => {
       )}
 
       {/* Caption Grid */}
-      {!isLoading && !error && filteredCaptions.length > 0 && (
+      {!error && filteredCaptions.length > 0 && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCaptions.map(caption => (
@@ -360,47 +288,20 @@ const CaptionLibrary: React.FC = () => {
             ))}
           </div>
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="mt-8 flex justify-center items-center gap-2">
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              
-              {paginationItems.map((item, index) =>
-                item === 'ellipsis' ? (
-                  <span
-                    key={`ellipsis-${index}`}
-                    className="px-3 py-2 text-gray-500 dark:text-gray-400 select-none"
-                  >
-                    …
-                  </span>
-                ) : (
-                  <button
-                    key={item}
-                    onClick={() => handlePageChange(item)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                      item === currentPage
-                        ? 'bg-pink-500 text-white'
-                        : 'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
-                    }`}
-                  >
-                    {item}
-                  </button>
-                )
+          {/* Load More */}
+          {!filter.searchQuery && (
+            <div className="mt-8 flex justify-center">
+              {hasMore ? (
+                <button
+                  onClick={loadMore}
+                  disabled={isLoading}
+                  className="px-6 py-3 bg-pink-500 text-white rounded-xl hover:bg-pink-600 transition-colors disabled:opacity-50"
+                >
+                  {isLoading ? 'Đang tải...' : 'Tải thêm'}
+                </button>
+              ) : (
+                <div className="text-gray-600 dark:text-gray-300">Đã hiển thị tất cả</div>
               )}
-
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="p-2 rounded-lg bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-              >
-                <ChevronRight size={20} />
-              </button>
             </div>
           )}
         </>

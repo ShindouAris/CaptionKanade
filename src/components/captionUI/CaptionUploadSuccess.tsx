@@ -55,7 +55,7 @@ export const CaptionUploadSuccess: React.FC<CaptionUploadSuccessProps> = ({ open
                     />
                   )}
                   <span className="text-sm font-bold truncate max-w-48" style={{ color: caption.color }}>
-                    {caption.text.length > 40 ? `${caption.text.substring(0, 40)}...` : caption.text}
+                    {caption.text.length > 40 ? `${caption.text.substring(0, 40)}...` : caption.text.trim() || 'Caption Kanade'}
                   </span>
                 </div>
               </div>

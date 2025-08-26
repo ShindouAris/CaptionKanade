@@ -88,7 +88,7 @@ export const CaptionItem: React.FC<CaptionProps> = ({
               "
               style={{ color: caption.color }}
             >
-              {caption.text.length > 40 ? `${caption.text.substring(0, 40)}...` : caption.text}
+              {caption.text.length > 40 ? `${caption.text.substring(0, 40)}...` : caption.text.trim() || 'Caption Kanade'}
             </span>
           </div>
         </div>
@@ -105,7 +105,7 @@ export const CaptionItem: React.FC<CaptionProps> = ({
         {/* Full caption text */}
         <div className="mb-4">
           <p className="text-gray-800 dark:text-gray-200 font-medium leading-relaxed text-sm">
-            {caption.text}
+            {caption.text.trim() || 'Caption Kanade'}
           </p>
         </div>  
 
@@ -222,7 +222,7 @@ export const CaptionItem: React.FC<CaptionProps> = ({
                   className="text-md sm:text-xl font-bold truncate max-w-48 sm:max-w-xs"
                   style={{ color: caption.color }}
                 >
-                  {caption.text.length > 40 ? `${caption.text.substring(0, 40)}...` : caption.text}
+                  {caption.text.length > 40 ? `${caption.text.substring(0, 40)}...` : caption.text.trim() || 'Caption Kanade'}
                 </span>
               </div>
             </div>

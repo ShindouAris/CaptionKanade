@@ -121,7 +121,7 @@ const CaptionBuilder: React.FC = () => {
     setIsSubmitting(true);
     try {
       const captionData: Omit<Caption, 'id' | 'created_at' | 'updated_at'> & { icon_file?: File } = {
-        text: captionText.trim() || 'Caption Kanade',
+        text: captionText.trim() || '',
         tags: tags.length > 0 ? tags : null,
         author: user.id,
         type: iconFile ? 'image_icon' : 'background',

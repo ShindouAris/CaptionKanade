@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { CaptionItem } from '../captionUI/CaptionItem';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCaptions } from '@/contexts/CaptionContext';
+import DeleteConfirmationDialog from '../captionUI/DeleteConfirmationDialog';
 const API_URL = import.meta.env.VITE_API_URL
 
 export interface Caption {
@@ -36,6 +37,15 @@ const UserUploaded: React.FC = () => {
   const [nextToken, setNextToken] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState<boolean>(false);
   const { toggleFavorite, deleteCaption,} = useCaptions();
+  const [deleteDialog, setDeleteDialog] = useState<{
+    isOpen: boolean;
+    captionId: string | null;
+    isLoading: boolean;
+  }>({
+    isOpen: false,
+    captionId: null,
+    isLoading: false,
+  });
 
   // Fixed get_posted function - removed nextToken dependency to prevent infinite loops
   const getPosted = useCallback(async (token: string | null = null): Promise<PostsResponse> => {
@@ -109,6 +119,29 @@ const UserUploaded: React.FC = () => {
     loadPosts();
   };
 
+  // Open delete confirmation dialog
+  const handleDelete = (id: string) => {
+    setDeleteDialog({ isOpen: true, captionId: id, isLoading: false });
+  };
+
+  // Confirm deletion
+  const confirmDelete = async () => {
+    if (!deleteDialog.captionId) return;
+    setDeleteDialog(prev => ({ ...prev, isLoading: true }));
+    try {
+      await deleteCaption(deleteDialog.captionId);
+      setPosts(prev => prev.filter(p => p.id !== deleteDialog.captionId));
+    } catch (err) {
+      console.error('Lỗi khi xóa caption:', err);
+    } finally {
+      setDeleteDialog({ isOpen: false, captionId: null, isLoading: false });
+    }
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialog({ isOpen: false, captionId: null, isLoading: false });
+  };
+
   if (loading) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden mt-2 backdrop:blur-0">
@@ -149,6 +182,7 @@ const UserUploaded: React.FC = () => {
   }
 
   return (
+    <>
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden mt-2 backdrop:blur-0">
       <div className="pt-16 pb-8 px-8 items-center text-center">
         <div className="mb-6">
@@ -177,7 +211,7 @@ const UserUploaded: React.FC = () => {
                 caption={post}
                 user={authContext.user}
                 toggleFavorite={toggleFavorite}
-                handleDelete={deleteCaption}
+                handleDelete={handleDelete}
               />
             ))}
 
@@ -207,6 +241,18 @@ const UserUploaded: React.FC = () => {
         )}
       </div>
     </div>
+    {/* Delete Confirmation Dialog */}
+    <DeleteConfirmationDialog
+      isOpen={deleteDialog.isOpen}
+      onClose={closeDeleteDialog}
+      onConfirm={confirmDelete}
+      title="Xóa Caption"
+      description="Bạn có chắc chắn muốn xóa caption này? Hành động này không thể hoàn tác."
+      confirmText="Xóa Caption"
+      cancelText="Hủy"
+      isLoading={deleteDialog.isLoading}
+    />
+    </>
   );
 };
 

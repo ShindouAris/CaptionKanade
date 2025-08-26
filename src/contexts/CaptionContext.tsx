@@ -31,6 +31,14 @@ interface PaginatedResponse {
   captions: Caption[];
 }
 
+interface CursorResponse {
+  captions: Caption[];
+  has_more: boolean;
+  next_token: string | null;
+  limit: number;
+  count: number;
+}
+
 interface CaptionContextType {
   captions: Caption[];
   filteredCaptions: Caption[];
@@ -51,6 +59,8 @@ interface CaptionContextType {
   deleteCaption: (id: string) => Promise<void>;
   toggleFavorite: (id: string) => Promise<void>;
   fetchCaptions: (page: number) => Promise<void>;
+  loadMore: () => Promise<void>;
+  hasMore: boolean;
   user: {
     isMember: boolean;
     uploadQuota: number;
@@ -86,9 +96,11 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [cachedTotal, setCachedTotal] = useState(0);
   const [totalCaptions, setTotalCaptions] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(21);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [nextToken, setNextToken] = useState<string | null>(null);
   const [filter, setFilter] = useState<CaptionContextType['filter']>({
     searchQuery: '',
     tags: [],
@@ -169,30 +181,79 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setIsLoading(true);
     setError(null);
     try {
-      const headers: Record<string, string> = {};
-      if (accessToken) {
-        headers['Authorization'] = `Bearer ${accessToken}`;
-      }
-      const response = await fetch(`${API_URL}/captions/${page}`, { headers });
-      if (response.ok) {
+      // Nếu không có searchQuery, dùng API next_token v2
+      if (!filter.searchQuery) {
+        const headers: Record<string, string> = {};
+        if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+        const response = await fetch(`${API_URL}/captions/v2/get?limit=${pageSize}`, { headers });
+        if (!response.ok) throw new Error('Failed to fetch captions');
+        const data: CursorResponse = await response.json();
+        const newCaptions = data.captions.map(caption => ({
+          ...caption,
+          is_favorite: authUser ? caption.is_favorite : localFavorites.has(caption.id)
+        }));
+        setCaptions(newCaptions);
+        setCachedCaptions(newCaptions);
+        setTotalCaptions(newCaptions.length);
+        setCachedTotal(newCaptions.length);
+        setCurrentPage(1);
+        setPageSize(data.limit || pageSize);
+        setHasMore(data.has_more);
+        setNextToken(data.next_token);
+      } else {
+        // Nếu có searchQuery, để luồng searchCaptions xử lý, ở đây fallback về trang 1 cũ nếu cần
+        const headers: Record<string, string> = {};
+        if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+        const response = await fetch(`${API_URL}/captions/1`, { headers });
+        if (!response.ok) throw new Error('Failed to fetch captions');
         const data: PaginatedResponse = await response.json();
         const newCaptions = data.captions.map(caption => ({
           ...caption,
           is_favorite: authUser ? caption.is_favorite : localFavorites.has(caption.id)
         }));
         setCaptions(newCaptions);
-        // Cache kết quả fetch
         setCachedCaptions(newCaptions);
         setTotalCaptions(data.total);
         setCachedTotal(data.total);
         setCurrentPage(data.page);
         setPageSize(data.page_size);
-      } else {
-        throw new Error('Failed to fetch captions');
+        setHasMore(false);
+        setNextToken(null);
       }
     } catch (error) {
       console.error('Error fetching captions:', error);
       setError(error instanceof Error ? error.message : 'An error occurred while fetching captions');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const loadMore = async () => {
+    if (!nextToken || filter.searchQuery) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const headers: Record<string, string> = {};
+      if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+      const response = await fetch(`${API_URL}/captions/v2/get?limit=${pageSize}&next_token=${encodeURIComponent(nextToken)}`, { headers });
+      if (!response.ok) throw new Error('Failed to fetch more captions');
+      const data: CursorResponse = await response.json();
+      const moreCaptions = data.captions.map(caption => ({
+        ...caption,
+        is_favorite: authUser ? caption.is_favorite : localFavorites.has(caption.id)
+      }));
+      setCaptions(prev => {
+        const merged = [...prev, ...moreCaptions];
+        setTotalCaptions(merged.length);
+        setCachedCaptions(merged);
+        setCachedTotal(merged.length);
+        return merged;
+      });
+      setHasMore(data.has_more);
+      setNextToken(data.next_token);
+    } catch (error) {
+      console.error('Error loading more captions:', error);
+      setError(error instanceof Error ? error.message : 'An error occurred while loading more captions');
     } finally {
       setIsLoading(false);
     }
@@ -412,6 +473,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setTotalCaptions(cachedTotal);
     setCurrentPage(1);
     setFilter(prev => ({ ...prev, searchQuery: '' }));
+    // giữ nguyên next_token/hasMore theo cache đang có
   };
 
   // Filter and sort captions - now only filter the current page
@@ -460,6 +522,8 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       deleteCaption,
       toggleFavorite: debouncedToggleFavorite,
       fetchCaptions,
+      loadMore,
+      hasMore,
       user,
       updateUserQuota,
       canUploadIcon,
