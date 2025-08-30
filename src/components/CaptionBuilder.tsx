@@ -14,6 +14,7 @@ import { Preview } from './captionUI/Preview';
 import { CaptionUploadSuccess } from './captionUI/CaptionUploadSuccess';
 import {IconUrlUpload} from './captionUI/IconUrlUpload';
 import { UploadConfig } from './captionUI/UploadConfig';
+import { IconUploadRecent } from './captionUI/IconUploadrecent';
 
 
 const CaptionBuilder: React.FC = () => {
@@ -193,6 +194,20 @@ const CaptionBuilder: React.FC = () => {
             remainingQuota={remainingCaptionQuota}
             />
           )}
+        
+          <IconUploadRecent 
+            iconPreview={iconPreview}
+            isUploading={isUploading}
+            onUpload={(url: string) => {
+              setIconPreview(url);
+              setIconUrl(url);
+            }}
+            onRemove={() => {
+              setIconPreview('');
+              setIconUrl('');
+            }}
+            remainingQuota={remainingIconQuota}
+          />
 
           {!captionUser.isMember && !iconUrl && (remainingIconQuota > 0) && (
             <IconUpload
@@ -314,7 +329,7 @@ const CaptionBuilder: React.FC = () => {
               }}
               >
               <span className="hidden sm:inline">Bạn còn {remainingCaptionQuota} lượt upload caption hôm nay</span>
-              <span className="sm:hidden">Còn {remainingCaptionQuota} lượt</span>
+              <span className="sm:hidden">Còn {remainingCaptionQuota} lượt trong ngày hôm nay</span>
             </div>
           </div>
         </div>
