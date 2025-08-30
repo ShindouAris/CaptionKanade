@@ -15,6 +15,7 @@ import EmailVerification from './components/EmailVerification';
 import ResetPassword from './components/ResetPassword';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
+import NotFoundPage from './components/404';
 import { CaptionProvider } from './contexts/CaptionContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -403,6 +404,9 @@ const App: React.FC = () => {
               
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfService />} />
+              
+              {/* 404 Route - Must be last */}
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Layout>
         </CaptionProvider>
