@@ -2,23 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { Menu, Home, Edit3, BookOpen, Moon, Sun, LogOut, HelpCircle, MessageCircle, Flame } from 'lucide-react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { MdOutlineCollectionsBookmark } from "react-icons/md";
-import HomePage from './components/HomePage';
-import CaptionBuilder from './components/CaptionBuilder';
-import CaptionLibrary from './components/CaptionLibrary';
-import Tutorial from './components/Tutorial';
-import Trending from './components/Trending';
-import ContactPage from './components/ContactPage';
-import Login from './components/Login';
-import Register from './components/Register';
-import UserPage from './components/UserPage';
-import EmailVerification from './components/EmailVerification';
-import ResetPassword from './components/ResetPassword';
-import PrivacyPolicy from './components/PrivacyPolicy';
-import TermsOfService from './components/TermsOfService';
+// import HomePage from './components/HomePage';
+// import CaptionBuilder from './components/CaptionBuilder';
+// import CaptionLibrary from './components/CaptionLibrary';
+// import Tutorial from './components/Tutorial';
+// import Trending from './components/Trending';
+// import ContactPage from './components/ContactPage';
+// import Login from './components/Login';
+// import Register from './components/Register';
+// import UserPage from './components/UserPage';
+// import EmailVerification from './components/EmailVerification';
+// import ResetPassword from './components/ResetPassword';
+// import PrivacyPolicy from './components/PrivacyPolicy';
+// import TermsOfService from './components/TermsOfService';
 import NotFoundPage from './components/404';
 import { CaptionProvider } from './contexts/CaptionContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import ProtectedRoute from './components/ProtectedRoute';
+// import ProtectedRoute from './components/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -366,44 +366,44 @@ const App: React.FC = () => {
           
           <Layout>
             <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/verify-email" element={<EmailVerification />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
+              {/*<Route path="/login" element={<Login />} />*/}
+              {/*<Route path="/register" element={<Register />} />*/}
+              {/*<Route path="/verify-email" element={<EmailVerification />} />*/}
+              {/*<Route path="/reset-password" element={<ResetPassword />} />*/}
               
-              <Route path="/" element={
-                  <HomePage />
-              } />
+              {/*<Route path="/" element={*/}
+              {/*    <HomePage />*/}
+              {/*} />*/}
               
-              <Route path="/builder" element={
-                <ProtectedRoute requireVerified>
-                  <CaptionBuilder />
-                </ProtectedRoute>
-              } />
+              {/*<Route path="/builder" element={*/}
+              {/*  <ProtectedRoute requireVerified>*/}
+              {/*    <CaptionBuilder />*/}
+              {/*  </ProtectedRoute>*/}
+              {/*} />*/}
               
-              <Route path="/library" element={
-                  <CaptionLibrary />
-              } />
-              <Route path="/trending" element={
-                  <Trending />
-              } />
+              {/*<Route path="/library" element={*/}
+              {/*    <CaptionLibrary />*/}
+              {/*} />*/}
+              {/*<Route path="/trending" element={*/}
+              {/*    <Trending />*/}
+              {/*} />*/}
               
-              <Route path="/tutorial" element={
-                  <Tutorial />
-              } />
+              {/*<Route path="/tutorial" element={*/}
+              {/*    <Tutorial />*/}
+              {/*} />*/}
               
-              <Route path="/contact" element={
-                  <ContactPage />
-              } />
+              {/*<Route path="/contact" element={*/}
+              {/*    <ContactPage />*/}
+              {/*} />*/}
               
-              <Route path="/profile" element={
-                <ProtectedRoute requireVerified>
-                  <UserPage />
-                </ProtectedRoute>
-              } />
+              {/*<Route path="/profile" element={*/}
+              {/*  <ProtectedRoute requireVerified>*/}
+              {/*    <UserPage />*/}
+              {/*  </ProtectedRoute>*/}
+              {/*} />*/}
               
-              <Route path="/privacy" element={<PrivacyPolicy />} />
-              <Route path="/terms" element={<TermsOfService />} />
+              {/*<Route path="/privacy" element={<PrivacyPolicy />} />*/}
+              {/*<Route path="/terms" element={<TermsOfService />} />*/}
               
               {/* 404 Route - Must be last */}
               <Route path="*" element={<NotFoundPage />} />
