@@ -15,6 +15,7 @@ import { CaptionUploadSuccess } from './captionUI/CaptionUploadSuccess';
 import {IconUrlUpload} from './captionUI/IconUrlUpload';
 import { UploadConfig } from './captionUI/UploadConfig';
 import { IconUploadRecent } from './captionUI/IconUploadrecent';
+import { IconGIF } from './captionUI/IconGIF';
 
 
 const CaptionBuilder: React.FC = () => {
@@ -194,6 +195,17 @@ const CaptionBuilder: React.FC = () => {
             remainingQuota={remainingCaptionQuota}
             />
           )}
+
+          <IconGIF 
+            iconPreview={iconPreview}
+            isUploading={isUploading}
+            onUpload={handleIconUrlUpload}
+            onRemove={() => {
+              setIconPreview('');
+              setIconUrl('');
+              }}
+            remainingQuota={remainingCaptionQuota}
+          />
         
           <IconUploadRecent 
             iconPreview={iconPreview}
