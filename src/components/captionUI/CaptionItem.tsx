@@ -215,7 +215,7 @@ export const CaptionItem: React.FC<CaptionProps> = ({
     <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-4xl p-0 overflow-hidden">
           <DialogHeader className="p-6 border-b">
-            <DialogTitle className="text-lg font-bold">{caption.text}</DialogTitle>
+            <DialogTitle className="text-lg font-bold">{caption.text || 'Caption Kanade'}</DialogTitle>
           </DialogHeader>
           <div className="p-6 space-y-4">
             {/* Preview lớn */}
