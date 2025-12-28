@@ -3,6 +3,7 @@ import { X, CheckCircle, RefreshCw, ChevronLeft, ChevronRight } from "lucide-rea
 import { PiGifFill } from "react-icons/pi";
 import { useAuth } from "@/contexts/AuthContext";
 import { GifResponse } from "@/types/GIF";
+import { Badge } from "../ui/badge";
 
 // Get API URL from environment or use relative path as fallback
 const API_URL = import.meta.env.VITE_API_URL || '';
@@ -160,7 +161,13 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <PiGifFill className="text-pink-600 dark:text-pink-400" size={18} />
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Icon GIF</h3>
-            <span className="text-red-600 underline text-sm">Powered by KLIPY</span>
+            <Badge variant="secondary" className="ml-auto px-2 py-1 text-xs">
+              Beta
+            </Badge>
+            <span className="text-red-600 underline text-sm hover:text-red-400 cursor-pointer" 
+              onClick={() => window.open("https://klipy.com/", "_blank", "noopener noreferrer")}>
+              Powered by KLIPY
+            </span>
           </div>
 
           <div className="space-y-3 sm:space-y-4">
