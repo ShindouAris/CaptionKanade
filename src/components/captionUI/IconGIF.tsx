@@ -109,7 +109,7 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
       if (query.trim()) {
         searchTimeoutRef.current = setTimeout(() => {
           searchGifs(query, 1);
-        }, 300);
+        }, 1000);
       } else {
         fetchTrendingGIFs();
       }
@@ -160,6 +160,7 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <PiGifFill className="text-pink-600 dark:text-pink-400" size={18} />
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Icon GIF</h3>
+            <span className="text-red-600 underline text-sm">Powered by KLIPY</span>
           </div>
 
           <div className="space-y-3 sm:space-y-4">
@@ -170,7 +171,7 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
                   type="text"
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  placeholder="Tìm GIF phù hợp..."
+                  placeholder="Tìm GIF phù hợp trên nền tảng KLIPY..."
                   className="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm sm:text-base"
                   disabled={loading}
                 />
