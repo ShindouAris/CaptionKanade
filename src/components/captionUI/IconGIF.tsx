@@ -178,7 +178,8 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
                   type="text"
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  placeholder="Tìm GIF phù hợp trên nền tảng KLIPY..."
+                  placeholder="Search KLIPY..."
+                  title="Tìm Gif trên KLIPY"
                   className="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm sm:text-base"
                   disabled={loading}
                 />
