@@ -309,9 +309,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-200 via-sky-100 to-indigo-500 dark:from-blue-900 dark:via-purple-900 dark:to-green-300 transition-all duration-300">
       {/* Banner lên lịch bảo trì */}
-      <div className="bg-red-600 text-white p-4 text-center">
+      {/* <div className="bg-red-600 text-white p-4 text-center">
           ⚠️ Cảnh báo: Hệ thống đang bảo trì, dữ liệu sau bảo trì sẽ chỉ được bảo lưu đến 23:10 ngày 4/1/2026.
-        </div>
+        </div> */}
       <div className="flex h-screen">
         <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
         
