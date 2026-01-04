@@ -2,6 +2,12 @@ import React from 'react';
 import { Mail, MapPin, Clock, MessageCircle } from 'lucide-react';
 
 const ContactPage: React.FC = () => {
+  const bankinfor = {
+    BankAccount: '0522033565',
+    BankAccountName: 'TRAN THANH NAM',
+    BankName: 'Mờ bê (MB Bank)',
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -105,15 +111,73 @@ const ContactPage: React.FC = () => {
                   </p>
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                  Thời gian phản hồi: Trong vòng 24 giờ làm việc
+                  Thời gian phản hồi: Trong vòng 36 giờ làm việc
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Additional Info */}
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-pink-200 dark:border-gray-600">
+          <div className="text-center mb-6">
+            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Ủng hộ dự án này :D</h3>
+            <p className="text-gray-600 dark:text-gray-300">Dự án này được đóng góp bởi cộng đồng để hoạt động, không có các bạn thì web không thể tồn tại.</p>
+          </div>
+          <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-6 mb-10 relative mx-auto">
+            <h2 className="text-2xl font-semibold mb-6 text-center text-pink-600">Hỗ trợ dự án này</h2>
+            <div className="flex flex-col md:flex-row gap-6 items-center justify-center">
+              <div className="w-full md:w-1/3 flex flex-col items-center">
+          <div className="bg-pink-100 p-4 rounded-lg w-64 h-64 flex items-center justify-center">
+            <img
+              src="/banking_infor.png"
+              alt="Donation QR Code"
+              className="max-w-full max-h-full"
+            />
+          </div>
+          <p className="mt-4 text-center text-gray-600">Buy me a coffee</p>
+              </div>
+              <div className="w-full md:w-1/2 bg-gray-50 rounded-lg p-6 flex flex-col items-center text-center">
+          <h3 className="text-xl font-semibold mb-4">Thông tin</h3>
+          <div className="space-y-4 w-full max-w-sm">
+            <div>
+              <p className="font-medium text-pink-600">Tài khoản ngân hàng:</p>
+              <p className="text-gray-600">{bankinfor.BankAccount}</p>
+            </div>
+            <div>
+              <p className="font-medium text-pink-600">Tên tài khoản:</p>
+              <p className="text-gray-600">{bankinfor.BankAccountName}</p>
+            </div>
+            <div>
+              <p className="font-medium text-pink-600">Tên ngân hàng:</p>
+              <p className="text-gray-600">{bankinfor.BankName}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 mt-4">
+                Sự ủng hộ của bạn giúp duy trì dự án và nâng cấp hệ thống. Cảm ơn bạn! 💖
+              </p>
+            </div>
+          </div>
+              </div>
+            </div>
+            <img
+              src="/aligatou.png"
+              alt="Donation Image" 
+              className="absolute bottom-0 right-0 opacity-20 w-1/4"
+            />
+          </div>
+          {/* Big sponsor image */}
+          <div className="w-full max-w-4xl mx-auto mt-3">
+            <h2 className="text-gray-600 dark:text-gray-300 font-bold text-4xl text-center mb-3">Nhà tài trợ lớn</h2>
+            <img
+              src="/big sponsor.png"
+              alt="Big Sponsor"
+              className="w-full h-auto rounded-lg shadow-lg"
+            />
+          </div>
+        </div>
+
+        {/* Additional Info */}
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-pink-200 dark:border-gray-600 mt-4">
           <div className="text-center mb-6">
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Thông Tin Khác</h3>
             <p className="text-gray-600 dark:text-gray-300">Các thông tin khác của chúng tôi</p>
