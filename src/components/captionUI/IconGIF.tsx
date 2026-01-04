@@ -30,6 +30,7 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
     const [data, setData] = useState<GifResponse["data"] | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const auth = useAuth();
+    const isComposingRef = useRef(false);
 
     // Sync with iconPreview prop when it changes
     React.useEffect(() => {
@@ -99,7 +100,18 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
 
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+    const handleCompositionStart = () => {
+      isComposingRef.current = true;
+    };
+
+    const handleCompositionEnd = (e: React.CompositionEvent<HTMLInputElement>) => {
+      isComposingRef.current = false;
+      // khi gõ xong tiếng Việt, trigger search lại
+      handleSearchChange(e as any);
+    };
+
     const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+      if (isComposingRef.current) return;
       const query = e.target.value;
       setSearchQuery(query);
 
@@ -112,7 +124,9 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
           searchGifs(query, 1);
         }, 1000);
       } else {
-        fetchTrendingGIFs();
+        searchTimeoutRef.current = setTimeout(() => {
+          fetchTrendingGIFs();
+        }, 500);
       }
     };
 
@@ -182,6 +196,8 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
                   title="Tìm Gif trên KLIPY"
                   className="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm sm:text-base"
                   disabled={loading}
+                  onCompositionStart={handleCompositionStart}
+                  onCompositionEnd={handleCompositionEnd}
                 />
                 {loading && (
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -293,6 +309,7 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
               <div className="text-xs text-gray-500 dark:text-gray-400 mt-3 space-y-1">
                 <div>• Click vào GIF để chọn làm icon cho caption</div>
                 <div>• GIF đã chọn sẽ có viền hồng và dấu tích</div>
+                <div>• Nếu chuyển trang mà nó vẫn hiện trang trước, thì là do tôi hết rate limit, đợi một chút là được</div>
               </div>
             </div>
           </div>
