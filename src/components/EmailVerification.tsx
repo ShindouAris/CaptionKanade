@@ -64,8 +64,10 @@ const EmailVerification: React.FC = () => {
     }
 
     // Validate code format (assuming it should be numeric)
-    const codeNumber = parseInt(verificationCode.trim(), 10);
-    if (isNaN(codeNumber)) {
+    const codeInput = verificationCode.trim(); // vẫn là string
+
+    // Kiểm tra chỉ chứa số thôi
+    if (!/^\d+$/.test(codeInput)) {
       setError('Mã xác thực phải là số');
       return;
     }
@@ -75,7 +77,7 @@ const EmailVerification: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await submitOtp(token, codeNumber);
+      await submitOtp(token, codeInput);
       setIsVerified(true);
       setSuccess('Tài khoản đã được xác minh thành công!...');
       

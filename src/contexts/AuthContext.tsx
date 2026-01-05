@@ -29,7 +29,7 @@ interface AuthContextType {
   refreshToken: string | null;
   get_posted: () => Promise<void>;
   verifyAccount: (token: string) => Promise<void>;
-  submitOtp: (token: string, otp: number) => Promise<void>;
+  submitOtp: (token: string, otp: string) => Promise<void>;
   getUserInfo: () => Promise<User | null>;
   googleauth: (token: string) => Promise<void>
   userInfo: User | null;
@@ -576,7 +576,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const submitOtp = useCallback(async (token: string, otp: number) => {
+  const submitOtp = useCallback(async (token: string, otp: string) => {
     setLoading(true);
     try {
       const response = await fetch(`${API_URL}/v1/user/submit_otp`, {
