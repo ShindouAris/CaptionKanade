@@ -164,8 +164,7 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
         if (searchQuery.trim()) {
           searchGifs(searchQuery, prevPage);
         } else {
-          setCurrentPage(prevPage);
-          fetchTrendingGIFs();
+          fetchTrendingGIFs(prevPage);
         }
       }
     };
