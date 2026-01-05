@@ -66,7 +66,7 @@ const SidebarContent: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) =
     { id: '/library', label: 'Library', icon: BookOpen },
     { id: '/trending', label: 'Trending', icon: Flame },
     { id: '/tutorial', label: 'Hướng dẫn', icon: HelpCircle },
-    { id: '/contact', label: 'Liên hệ', icon: MessageCircle },
+    { id: '/contact', label: 'Về chúng tôi', icon: MessageCircle },
     { id: '/error-report', label: 'Báo cáo lỗi', icon: BiMessageError },
   ];
 
