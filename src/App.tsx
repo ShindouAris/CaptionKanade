@@ -27,6 +27,8 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { BadgeCheckIcon } from 'lucide-react';
+import { ErrorReportV2 } from './components/ErrorReportV2';
+import { BiMessageError } from "react-icons/bi";
 
 interface NavigationItem {
   id: string;
@@ -65,6 +67,7 @@ const SidebarContent: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) =
     { id: '/trending', label: 'Trending', icon: Flame },
     { id: '/tutorial', label: 'Hướng dẫn', icon: HelpCircle },
     { id: '/contact', label: 'Liên hệ', icon: MessageCircle },
+    { id: '/error-report', label: 'Báo cáo lỗi', icon: BiMessageError },
   ];
 
   const beta_page: NavigationItem[] = [
@@ -374,6 +377,7 @@ const App: React.FC = () => {
               <Route path="/register" element={<Register />} />
               <Route path="/verify-email" element={<EmailVerification />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/error-report" element={<ErrorReportV2 />} />
 
               <Route path="/" element={<HomePage />} />
 
