@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { CaptionItem } from './captionUI/CaptionItem';
 import DeleteConfirmationDialog from './captionUI/DeleteConfirmationDialog';
-import toast from 'react-hot-toast';
 import { useCaptions } from '@/contexts/CaptionContext';
 
 const Trending: React.FC = () => {
