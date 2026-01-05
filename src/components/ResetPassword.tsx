@@ -38,7 +38,9 @@ const ResetPassword: React.FC = () => {
       });
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        setError(data.message || `HTTP error! status: ${response.status}`);
+        return;
       }
       
       const contentType = response.headers.get("content-type");
@@ -77,7 +79,7 @@ const ResetPassword: React.FC = () => {
         },
         body: JSON.stringify({
           email,
-          otp: parseInt(otp),
+          otp: otp,
           new_password: newPassword,
           turnstile_token: turnstileToken
         }),
