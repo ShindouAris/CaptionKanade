@@ -45,6 +45,9 @@ const Register: React.FC = () => {
     setIsLoading(true);
 
     try {
+      if (/@(icloud\.com|me\.com|mac\.com|privaterelay\.appleid\.com)$/i.test(email)) {
+        throw new Error("Không hỗ trợ email iCloud. Vui lòng sử dụng Gmail hoặc Outlook.");
+      }
       await register(email, password, turnstileToken);
       navigate('/verify-email', { state: { email } });
     } catch (err) {
