@@ -45,7 +45,7 @@ const Register: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await register(email, password, turnstileToken);
+      await register(email, password, turnstileToken);
       navigate('/verify-email', { state: { email } });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Đăng ký thất bại');

@@ -1,7 +1,6 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Badge } from './ui/badge';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
