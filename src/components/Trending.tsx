@@ -1,45 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Caption } from '../types/Caption';
 import { CaptionItem } from './captionUI/CaptionItem';
 import DeleteConfirmationDialog from './captionUI/DeleteConfirmationDialog';
 import toast from 'react-hot-toast';
-
-const API_URL = import.meta.env.VITE_API_URL;
+import { useCaptions } from '@/contexts/CaptionContext';
 
 const Trending: React.FC = () => {
   const { user, accessToken } = useAuth();
-  const [captions, setCaptions] = useState<Caption[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState(false);
-  const [nextToken, setNextToken] = useState<string | null>(null);
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; captionId: string | null; isLoading: boolean; }>({
     isOpen: false,
     captionId: null,
     isLoading: false,
   });
-
-  const fetchTrending = async (initial = false) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const headers: Record<string, string> = {};
-      if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
-      const qs = initial ? `limit=21` : `limit=21&next_token=${encodeURIComponent(nextToken || '')}`; // grid 3x3 mà 20 thì xấu lắm
-      const response = await fetch(`${API_URL}/captions/trending?${qs}`, { headers });
-      if (!response.ok) throw new Error('Failed to fetch trending');
-      const data = await response.json();
-      const mapped = (data.captions as Caption[]).map(c => ({ ...c }));
-      setCaptions(prev => initial ? mapped : [...prev, ...mapped]);
-      setHasMore(Boolean(data.has_more));
-      setNextToken(data.next_token || null);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Error fetching trending');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const {captions, toggleFavorite, fetchTrending, hasMore, error, isLoading, deleteCaption} = useCaptions();
 
   useEffect(() => {
     fetchTrending(true);
@@ -56,7 +29,8 @@ const Trending: React.FC = () => {
 
   const confirmDelete = async () => {
     try {
-      toast.error('Không hỗ trợ xóa ở trang Trending. Vui lòng xóa tại Library.');
+      if (!deleteDialog.captionId) return;
+      deleteCaption(deleteDialog.captionId);
     } finally {
       closeDeleteDialog();
     }
@@ -100,7 +74,7 @@ const Trending: React.FC = () => {
                 key={caption.id}
                 caption={caption}
                 user={user}
-                toggleFavorite={() => Promise.resolve()}
+                toggleFavorite={toggleFavorite}
                 handleDelete={handleDelete}
               />
             ))}

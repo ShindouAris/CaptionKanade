@@ -59,6 +59,7 @@ interface CaptionContextType {
   deleteCaption: (id: string) => Promise<void>;
   toggleFavorite: (id: string) => Promise<void>;
   fetchCaptions: (page: number) => Promise<void>;
+  fetchTrending: (initial?: boolean) => Promise<void>;
   loadMore: () => Promise<void>;
   hasMore: boolean;
   user: {
@@ -177,6 +178,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }, [location.pathname, accessToken]);
 
+  // @ts-ignore
   const fetchCaptions = async (page: number) => {
     setIsLoading(true);
     setError(null);
@@ -227,6 +229,27 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setIsLoading(false);
     }
   };
+
+    const fetchTrending = async (initial = false) => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const headers: Record<string, string> = {};
+        if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`;
+        const qs = initial ? `limit=21` : `limit=21&next_token=${encodeURIComponent(nextToken || '')}`; // grid 3x3 mà 20 thì xấu lắm
+        const response = await fetch(`${API_URL}/captions/trending?${qs}`, { headers });
+        if (!response.ok) throw new Error('Failed to fetch trending');
+        const data = await response.json();
+        const mapped = (data.captions as Caption[]).map(c => ({ ...c }));
+        setCaptions(prev => initial ? mapped : [...prev, ...mapped]);
+        setHasMore(Boolean(data.has_more));
+        setNextToken(data.next_token || null);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Error fetching trending');
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
   const loadMore = async () => {
     if (!nextToken || filter.searchQuery) return;
@@ -523,6 +546,7 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
       toggleFavorite: debouncedToggleFavorite,
       fetchCaptions,
       loadMore,
+      fetchTrending,
       hasMore,
       user,
       updateUserQuota,
