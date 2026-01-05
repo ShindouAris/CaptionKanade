@@ -27,11 +27,11 @@ interface AuthContextType {
   getAuthHeader: () => { Authorization: string } | {};
   accessToken: string | null;
   refreshToken: string | null;
-  get_posted: () => Promise<void>;
-  verifyAccount: (token: string) => Promise<void>;
+  get_posted: () => Promise<any>;
+  verifyAccount: () => Promise<void>;
   submitOtp: (token: string, otp: string) => Promise<void>;
   getUserInfo: () => Promise<User | null>;
-  googleauth: (token: string) => Promise<void>
+  googleauth: (token: string) => Promise<void>;
   userInfo: User | null;
 }
 
@@ -75,16 +75,24 @@ class TokenManager {
     }
   }
 
+  private static decodeBase64Url(input: string): string {
+    // JWT payload commonly uses base64url, not standard base64.
+    const base64 = input.replace(/-/g, '+').replace(/_/g, '/');
+    const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
+    return atob(padded);
+  }
+
   static parseTokenPayload(token: string | null): any {
     if (!token) return null;
-    
+
     try {
       const parts = token.split('.');
       if (parts.length !== 3) {
         throw new Error('Invalid token format');
       }
-      
-      const payload = JSON.parse(atob(parts[1]));
+
+      const decoded = this.decodeBase64Url(parts[1]);
+      const payload = JSON.parse(decoded);
       return payload;
     } catch (error) {
       console.error('Failed to parse token:', error);
@@ -140,17 +148,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [userInfo, setUserInfo] = useState<User | null>(null);
-  const [next_token, setNextToken] = useState<string | null>(null);
+  const [nextToken, setNextToken] = useState<string | null>(null);
 
   // Use refs to track refresh state and prevent multiple concurrent refreshes
   const refreshTimeoutRef = useRef<number | null>(null);
   const isRefreshingRef = useRef<boolean>(false);
   const refreshPromiseRef = useRef<Promise<void> | null>(null);
-  
-  // Use refs to avoid dependency loops
+
+  // Use refs to avoid dependency loops + stale closures
   const userRef = useRef<User | null>(null);
+
+  // Keep latest tokens available to callbacks without dependency churn.
   const accessTokenRef = useRef<string | null>(null);
   const refreshTokenRef = useRef<string | null>(null);
+
+  // Initialize refs
+  useEffect(() => {
+    const savedAccessToken = TokenManager.getAccessToken();
+    const savedRefreshToken = TokenManager.getRefreshToken();
+    setAccessToken(savedAccessToken);
+    setRefreshToken(savedRefreshToken);
+  }, []);
 
   // Update refs when state changes
   useEffect(() => {
@@ -208,7 +226,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     const refreshPromise = (async () => {
       try {
-        const currentRefreshToken = TokenManager.getRefreshToken();
+        const currentRefreshToken = TokenManager.getRefreshToken() ?? refreshTokenRef.current;
         
         if (!currentRefreshToken) {
           throw new Error('No refresh token found');
@@ -474,34 +492,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     clearAuthState();
   }, [clearAuthState]);
 
-  const getUserInfo = useCallback(async () => {
-    if (!accessToken || !user?.id) {
+  const getUserInfo = useCallback(async (): Promise<User | null> => {
+    const currentAccessToken = accessTokenRef.current;
+    const currentUserId = userRef.current?.id;
+
+    if (!currentAccessToken || !currentUserId) {
       throw new Error('User not authenticated');
     }
     
     const response = await fetch(`${API_URL}/v1/member/get-user-data`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        'Authorization': `Bearer ${currentAccessToken}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        user_id: user.id
+        user_id: currentUserId
       })
     });
     const data = await response.json();
     setUserInfo(data);
     return data;
-  }, [accessToken, user?.id]);
+  }, []);
 
   const get_posted = useCallback(async () => {
-    if (!user || !accessToken) {
+    const currentUser = userRef.current;
+    const currentAccessToken = accessTokenRef.current;
+
+    if (!currentUser || !currentAccessToken) {
       throw new Error('User not authenticated');
     }
-    const response = await fetch(`${API_URL}/v1/member/posts${next_token ? `?next_token=${next_token}` : ''}`, {
+    const response = await fetch(`${API_URL}/v1/member/posts${nextToken ? `?next_token=${nextToken}` : ''}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        'Authorization': `Bearer ${currentAccessToken}`,
         'Content-Type': 'application/json'
       }
     });
@@ -511,17 +535,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const data = await response.json();
     setNextToken(data.next_token || null);
     return data;
-  }, [user, accessToken, next_token]);
+  }, [nextToken]);
 
   const setUsername = useCallback(async (username: string) => {
-    if (!user || !accessToken) {
+    const currentUser = userRef.current;
+    const currentAccessToken = accessTokenRef.current;
+
+    if (!currentUser || !currentAccessToken) {
       throw new Error('User not authenticated');
     }
     
     const response = await fetch(`${API_URL}/v1/member/change_username`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${accessToken}`,
+        'Authorization': `Bearer ${currentAccessToken}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ username })
@@ -544,25 +571,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user, accessToken]);
 
   const getAuthHeader = useCallback(() => {
-    return accessToken ? { 
-      'Authorization': `Bearer ${accessToken}`,
+    const currentAccessToken = accessTokenRef.current;
+    return currentAccessToken ? {
+      'Authorization': `Bearer ${currentAccessToken}`,
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     } : {
       'Content-Type': 'application/json',
       'Accept': 'application/json'
     };
-  }, [accessToken]);
+  }, []);
 
-  const verifyAccount = useCallback(async (token: string) => {
+  const verifyAccount = useCallback(async () => {
     setLoading(true);
+    const token = TokenManager.getAccessToken()
+    if (!token) {
+      throw new Error("Bạn chưa đăng nhập")
+    }
+    if (TokenManager.isTokenExpired(token)) {
+      throw new Error("Phiên hiện tại của bạn đã hết hạn, vui lòng đăng nhập lại");
+    }
+    const tokenPayload = TokenManager.parseTokenPayload(token);
+    const current_session = TokenManager.createUserFromPayload(tokenPayload);
+    if (current_session?.is_verified) {
+      throw new Error("Tài khoản đã được xác minh trước đó");
+    }
+    if (!current_session || !current_session.is_active) {
+      throw new Error("Tài khoản không hợp lệ hoặc đã bị vô hiệu hóa");
+    }
     try {
       const response = await fetch(`${API_URL}/v1/user/verify_account`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ token })
+        body: JSON.stringify({ token: token })
       });
 
       if (!response.ok) {

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Mail, Loader2, CheckCircle2, XCircle, RefreshCw } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { REGEXP_ONLY_DIGITS } from 'input-otp';
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from './ui/input-otp';
 
 const EmailVerification: React.FC = () => {
   const [verificationCode, setVerificationCode] = useState('');
@@ -36,9 +38,20 @@ const EmailVerification: React.FC = () => {
 
         setToken(verificationToken);
         
-        // Request verification code to be sent
-        await verifyAccount(verificationToken);
-        setSuccess('Verification code sent to your email.');
+        try {
+          await verifyAccount();
+          setSuccess('Đã gửi mã xác thực tới email của bạn, kiểm tra hộp thư rác nếu không tìm thấy.');
+        } catch (err) {
+          console.error('Error sending verification code:', err);
+          if (err instanceof Error) {
+            if (err.message === "Tài khoản đã được xác minh trước đó") {
+              navigate('/login', { replace: true });
+            }
+            setError(err.message);
+            return;
+          }
+          setError("Gửi mã xác thực thất bại, vui lòng báo cáo lỗi cho quản trị viên.");
+        }
         
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to initialize verification';
@@ -55,6 +68,11 @@ const EmailVerification: React.FC = () => {
     
     if (!token) {
       setError('Mã xác thực không tìm thấy, vui lòng thử lại.');
+      return;
+    }
+
+    if (user?.is_verified) {
+      setError('Tài khoản đã được xác minh trước đó. Vui lòng đăng nhập.');
       return;
     }
 
@@ -106,7 +124,7 @@ const EmailVerification: React.FC = () => {
     setIsResending(true);
 
     try {
-      await verifyAccount(token);
+      await verifyAccount();
       setSuccess('Mã mới đã được gửi tới email của bạn!');
       setVerificationCode(''); // Clear the input
       
@@ -168,25 +186,32 @@ const EmailVerification: React.FC = () => {
 
         {/* Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div>
-            <label htmlFor="code" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <div className="w-full flex flex-col items-center">
+              <label htmlFor="code" className="block text-lg sm:text-xl font-semibold text-gray-700 dark:text-gray-300 mb-3 text-center">
               Mã xác thực
-            </label>
-            <input
-              id="code"
-              name="code"
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              required
-              value={verificationCode}
-              onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, ''))} // Only allow digits
-              className="appearance-none relative block w-full px-4 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:placeholder-gray-400 text-center text-xl tracking-widest font-mono"
-              placeholder="XXXXXX"
-              maxLength={6}
-              disabled={isLoading || isResending}
-            />
-          </div>
+              </label>
+              <div className="flex justify-center w-full">
+              <InputOTP
+                maxLength={6}
+                pattern={REGEXP_ONLY_DIGITS}
+                value={verificationCode}
+                onChange={(value) => setVerificationCode(value)}
+                className="max-w-lg w-full text-2xl sm:text-3xl tracking-widest"
+              >
+                <InputOTPGroup>
+                <InputOTPSlot index={0} className='dark:border-white' />
+                <InputOTPSlot index={1} className='dark:border-white' />
+                <InputOTPSlot index={2} className='dark:border-white' />
+                </InputOTPGroup>
+                <InputOTPSeparator />
+                <InputOTPGroup>
+                <InputOTPSlot index={3} className='dark:border-white' />
+                <InputOTPSlot index={4} className='dark:border-white' />
+                <InputOTPSlot index={5} className='dark:border-white' />
+                </InputOTPGroup>
+              </InputOTP>
+              </div>
+            </div>
 
           {/* Success Message */}
           {success && (
@@ -225,7 +250,7 @@ const EmailVerification: React.FC = () => {
               <button
                 type="button"
                 onClick={handleResendCode}
-                disabled={isLoading || isResending || !token}
+                disabled={isLoading || isResending || !token || user?.is_verified}
                 className="text-sm font-medium text-pink-600 hover:text-pink-500 dark:text-pink-400 dark:hover:text-pink-300 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center transition-colors"
               >
                 {isResending ? (
