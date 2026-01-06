@@ -61,7 +61,7 @@ export const CaptionUploadSuccess: React.FC<CaptionUploadSuccessProps> = ({ open
               </div>
 
               <div className="mt-3 flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
-                <button onClick={handleCopyId} className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                <button onClick={handleCopyId} className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition border border-pink-300">
                   ID: {caption.id}
                 </button>
                 <span>{new Date(caption.created_at).toLocaleDateString('vi-VN')}</span>
@@ -76,7 +76,13 @@ export const CaptionUploadSuccess: React.FC<CaptionUploadSuccessProps> = ({ open
             >
               Đóng
             </button>
-            {is_private ? <a
+            <button
+              onClick={handleCopyId}
+              className="px-4 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+            >
+              Copy ID caption
+            </button>
+            {/* {is_private ? <a
               href="/userprofile"
               className="px-4 py-2 rounded-lg bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold hover:from-pink-600 hover:to-purple-700 transition"
             >
@@ -89,7 +95,7 @@ export const CaptionUploadSuccess: React.FC<CaptionUploadSuccessProps> = ({ open
             >
               Xem thư viện
             </a>
-            }
+            } */}
             
           </div>
         </div>
