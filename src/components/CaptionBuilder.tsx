@@ -351,7 +351,6 @@ const CaptionBuilder: React.FC = () => {
       <canvas ref={canvasRef} className="hidden" />
 
       <CaptionUploadSuccess
-        is_private={isPrivate}
         open={showUploadSuccess}
         onOpenChange={setShowUploadSuccess}
         caption={uploadedCaption}
