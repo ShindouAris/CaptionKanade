@@ -11,13 +11,13 @@ const HomePage: React.FC = () => {
       <section className="relative py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center">
-            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
               Tạo, lưu trữ và chia sẻ
               <span className="block bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
                 7749 caption
               </span>
               theo phong cách của bạn
-            </h2>
+            </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
               Công cụ tạo caption thông minh với khả năng tùy chỉnh không giới hạn. 
               Biến ảnh của bạn thành những câu chuyện đầy cảm xúc.

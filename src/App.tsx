@@ -29,6 +29,7 @@ import { cn } from '@/lib/utils';
 import { BadgeCheckIcon } from 'lucide-react';
 import { ErrorReportV2 } from './components/ErrorReportV2';
 import { BiMessageError } from "react-icons/bi";
+import GradientText from './components/GradientText';
 
 interface NavigationItem {
   id: string;
@@ -92,7 +93,15 @@ const SidebarContent: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) =
           to="/" 
           className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent"
         >
-          CaptionKanade
+          <GradientText 
+          yoyo={false}
+          className='font-bold'
+          animationSpeed={2}
+          colors={["#F6B1CE", "#1581BF", "#B3BFFF", "#450693"]}
+
+          >
+            CaptionKanade
+          </GradientText>
         </Link>
       </div>
 
@@ -289,7 +298,15 @@ const TopBar: React.FC<TopBarProps> = ({ toggleSidebar }) => {
           to="/" 
           className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent"
         >
-          CaptionKanade
+          <GradientText 
+          yoyo={false}
+          className='font-bold'
+          animationSpeed={2}
+          colors={["#F6B1CE", "#1581BF", "#B3BFFF", "#450693"]}
+
+          >
+            CaptionKanade
+          </GradientText>
         </Link>
         
         <div className="w-10"></div>
@@ -310,14 +327,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-200 via-sky-100 to-indigo-500 dark:from-blue-900 dark:via-purple-900 dark:to-green-300 transition-all duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-[#F6B1CE] via-sky-100 to-[#B3BFFF] dark:from-[#6F00FF] dark:via-[#FFB8E0] dark:to-[#4E56C0] transition-all duration-300">
       {/* Banner lên lịch bảo trì */}
       {/* <div className="bg-red-600 text-white p-4 text-center">
           ⚠️ Cảnh báo: Hệ thống đang bảo trì, dữ liệu sau bảo trì sẽ chỉ được bảo lưu đến 23:10 ngày 4/1/2026.
         </div> */}
       <div className="flex h-screen">
         <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
-        
         <div className="flex-1 flex flex-col lg:ml-0 overflow-hidden">
           <TopBar toggleSidebar={toggleSidebar} />
           
