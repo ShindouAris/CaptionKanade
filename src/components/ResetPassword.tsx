@@ -39,6 +39,10 @@ const ResetPassword: React.FC = () => {
       
       if (!response.ok) {
         const data = await response.json();
+        if (data.message === 'This account is not register yet!') {
+          setError('Tài khoản không tồn tại!');
+          return;
+        }
         setError(data.message || `HTTP error! status: ${response.status}`);
         return;
       }
