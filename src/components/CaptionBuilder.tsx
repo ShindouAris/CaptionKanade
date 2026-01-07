@@ -16,6 +16,13 @@ import {IconUrlUpload} from './captionUI/IconUrlUpload';
 import { UploadConfig } from './captionUI/UploadConfig';
 import { IconUploadRecent } from './captionUI/IconUploadrecent';
 import { IconGIF } from './captionUI/IconGIF';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from './ui/select';
 
 
 const CaptionBuilder: React.FC = () => {
@@ -36,6 +43,7 @@ const CaptionBuilder: React.FC = () => {
   const [uploadedCaption, setUploadedCaption] = useState<Caption | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPrivate, setisPrivate] = useState(false)
+  const [uploadMode, setUploadMode] = useState<'gif' | 'url' | 'recent' | 'file'>('gif');
 
   const gradientPresets = [
     { top: '#FFDEE9', bottom: '#B5FFFC', name: 'Pastel Dream' },
@@ -182,58 +190,80 @@ const CaptionBuilder: React.FC = () => {
           <CaptionText value={captionText} onChange={setCaptionText} />
 
           {/* Icon Upload - Only for Members */}
-          
-          {!iconFile && (
-            <IconUrlUpload 
-            iconPreview={iconPreview}
-            isUploading={isUploading}
-            onUpload={handleIconUrlUpload}
-            onRemove={() => {
-              setIconPreview('');
-              setIconUrl('');
-              }}
-            remainingQuota={remainingCaptionQuota}
-            />
-          )}
 
-          <IconGIF 
-            iconPreview={iconPreview}
-            isUploading={isUploading}
-            onUpload={handleIconUrlUpload}
-            onRemove={() => {
-              setIconPreview('');
-              setIconUrl('');
-              }}
-            remainingQuota={remainingCaptionQuota}
-          />
-        
-          <IconUploadRecent 
-            iconPreview={iconPreview}
-            isUploading={isUploading}
-            onUpload={(url: string) => {
-              setIconPreview(url);
-              setIconUrl(url);
-            }}
-            onRemove={() => {
-              setIconPreview('');
-              setIconUrl('');
-            }}
-            remainingQuota={remainingIconQuota}
-          />
+          <div className="space-y-3">
+            <div className='font-bold text-black text-lg'>Tuỳ chọn tải lên icon caption</div>
+            <Select
+              value={uploadMode}
+              onValueChange={(value) => setUploadMode(value as typeof uploadMode)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Chọn cách upload" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="gif">GIF (mặc định)</SelectItem>
+                <SelectItem value="url">Dán URL</SelectItem>
+                <SelectItem value="recent">Gần đây</SelectItem>
+                {!captionUser.isMember && <SelectItem value="file">Tải file (PNG/GIF)</SelectItem>}
+              </SelectContent>
+            </Select>
 
-          {!captionUser.isMember && !iconUrl && (remainingIconQuota > 0) && (
-            <IconUpload
-            iconFile={iconFile}
-            iconPreview={iconPreview}
-            isUploading={isUploading}
-            onUpload={handleIconUpload}
-            onRemove={() => {
-                setIconFile(null);
-                setIconPreview('');
-              }}
-              remainingQuota={remainingIconQuota}
+            {uploadMode === 'url' && !iconFile && (
+              <IconUrlUpload
+                iconPreview={iconPreview}
+                isUploading={isUploading}
+                onUpload={handleIconUrlUpload}
+                onRemove={() => {
+                  setIconPreview('');
+                  setIconUrl('');
+                }}
+                remainingQuota={remainingCaptionQuota}
               />
             )}
+
+            {uploadMode === 'gif' && (
+              <IconGIF
+                iconPreview={iconPreview}
+                isUploading={isUploading}
+                onUpload={handleIconUrlUpload}
+                onRemove={() => {
+                  setIconPreview('');
+                  setIconUrl('');
+                }}
+                remainingQuota={remainingCaptionQuota}
+              />
+            )}
+
+            {uploadMode === 'recent' && (
+              <IconUploadRecent
+                iconPreview={iconPreview}
+                isUploading={isUploading}
+                onUpload={(url: string) => {
+                  setIconPreview(url);
+                  setIconUrl(url);
+                }}
+                onRemove={() => {
+                  setIconPreview('');
+                  setIconUrl('');
+                }}
+                remainingQuota={remainingIconQuota}
+              />
+            )}
+
+            {uploadMode === 'file' && !captionUser.isMember && !iconUrl && remainingIconQuota > 0 && (
+              <IconUpload
+                iconFile={iconFile}
+                iconPreview={iconPreview}
+                isUploading={isUploading}
+                onUpload={handleIconUpload}
+                onRemove={() => {
+                  setIconFile(null);
+                  setIconPreview('');
+                }}
+                remainingQuota={remainingIconQuota}
+              />
+            )}
+          </div>
 
           {/* Non-member notice */}
           {captionUser.isMember && (
