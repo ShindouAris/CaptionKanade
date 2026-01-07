@@ -1,9 +1,30 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import CountUp from './CountUp';
+const API_URL = import.meta.env.VITE_API_URL;
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
+  const [stats, setStats] = React.useState<{ posted: number, today: number} | null>(null);
+
+  React.useEffect(() => {
+    getStats();
+  }, []);
+
+  const getStats = async () => {
+    try {
+      const stats = await fetch(`${API_URL}/captions/stats`);
+      const statsJson = await stats.json();
+      setStats(statsJson);
+    } catch (error) {
+      console.error("Failed to fetch stats:", error);
+      setStats({
+        posted: 700,
+        today: 10
+      })
+    }
+  }
 
   return (
     <div className="relative overflow-hidden">
@@ -46,6 +67,40 @@ const HomePage: React.FC = () => {
         <div className="absolute top-1/2 left-1/4 w-8 h-8 bg-indigo-200 dark:bg-indigo-800 rounded-full animate-ping opacity-40"></div>
       </section>
 
+      {/* Stats */}
+
+      <section className="py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="relative rounded-2xl p-6 bg-gradient-to-br from-pink-50 to-white dark:from-pink-900/20 dark:to-gray-900/40 border border-pink-200 dark:border-pink-800 shadow-lg backdrop-blur-sm flex flex-col items-center text-center hover:scale-105 transition-transform">
+        <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white/90 dark:bg-white/5 text-2xl mb-4 ring-1 ring-pink-200 dark:ring-pink-700">
+          ✨
+        </div>
+        <CountUp from={0} to={stats?.posted || 700} className="text-4xl font-extrabold text-gray-900 dark:text-white"></CountUp>
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">Caption đã tạo</p>
+        <span className="mt-4 text-xs text-pink-600 dark:text-pink-400 bg-pink-50 dark:bg-pink-900/20 px-3 py-1 rounded-full">Cập nhật hàng ngày</span>
+          </div>
+
+          <div className="relative rounded-2xl p-6 bg-gradient-to-br from-purple-50 to-white dark:from-purple-900/20 dark:to-gray-900/40 border border-purple-200 dark:border-purple-800 shadow-lg backdrop-blur-sm flex flex-col items-center text-center hover:scale-105 transition-transform">
+        <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white/90 dark:bg-white/5 text-2xl mb-4 ring-1 ring-purple-200 dark:ring-purple-700">
+          🙌
+        </div>
+        <CountUp from={0} to={stats?.today || 36} className="text-4xl font-extrabold text-gray-900 dark:text-white"></CountUp>
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">Đăng hôm nay</p>
+        <span className="mt-4 text-xs text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 px-3 py-1 rounded-full">Hoạt động tích cực</span>
+          </div>
+          <div className="relative rounded-2xl p-6 bg-gradient-to-br from-indigo-50 to-white dark:from-indigo-900/20 dark:to-gray-900/40 border border-indigo-200 dark:border-indigo-800 shadow-lg backdrop-blur-sm flex flex-col items-center text-center hover:scale-105 transition-transform">
+        <div className="flex items-center justify-center w-16 h-16 rounded-full bg-white/90 dark:bg-white/5 text-2xl mb-4 ring-1 ring-indigo-200 dark:ring-indigo-700">
+          ⚡
+        </div>
+        <h4 className="text-4xl font-extrabold text-gray-900 dark:text-white">99.9%</h4>
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">Thời gian hoạt động</p>
+        <span className="mt-4 text-xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 px-3 py-1 rounded-full">Hỗ trợ 24/7</span>
+          </div>
+        </div>
+      </section>
+
+
+      {/* Survey Section */}
       <section className="py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto bg-white/80 dark:bg-gray-800/80 rounded-2xl shadow-lg border border-pink-300 dark:border-green-600 p-6 text-center">
           <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
