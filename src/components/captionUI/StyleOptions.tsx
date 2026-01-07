@@ -103,14 +103,12 @@ export const StyleOptions = React.memo(({
   selectedColorBottom,
   onColorChange,
   onGradientChange,
-  gradientPresets
 }: {
   selectedColor: string;
   selectedColorTop: string;
   selectedColorBottom: string;
   onColorChange: (color: string) => void;
   onGradientChange: (top: string, bottom: string) => void;
-  gradientPresets: Array<{ top: string; bottom: string; name: string; }>;
 }) => (
   <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-pink-200 dark:border-gray-600">
     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2 mb-4">
@@ -166,25 +164,6 @@ export const StyleOptions = React.memo(({
             onChange={(e) => onGradientChange(selectedColorTop, e.target.value)}
             className="w-full h-8 sm:h-10 rounded-lg border border-gray-300 dark:border-gray-600 cursor-pointer"
           />
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Gradient có sẵn
-        </label>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {gradientPresets.map((preset, index) => (
-            <button
-              key={index}
-              onClick={() => onGradientChange(preset.top, preset.bottom)}
-              className="aspect-square rounded-lg border-2 border-gray-300 dark:border-gray-600 hover:border-pink-500 transition-colors"
-              style={{
-                background: `linear-gradient(to bottom, ${preset.top}, ${preset.bottom})`
-              }}
-              title={preset.name}
-            />
-          ))}
         </div>
       </div>
     </div>

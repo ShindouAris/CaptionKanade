@@ -45,17 +45,6 @@ const CaptionBuilder: React.FC = () => {
   const [isPrivate, setisPrivate] = useState(false)
   const [uploadMode, setUploadMode] = useState<'gif' | 'url' | 'recent' | 'file'>('gif');
 
-  const gradientPresets = [
-    { top: '#FFDEE9', bottom: '#B5FFFC', name: 'Pastel Dream' },
-    { top: '#A8EDEA', bottom: '#FED6E3', name: 'Mint Rose' },
-    { top: '#FFB6C1', bottom: '#FFDAB9', name: 'Peach Blossom' },
-    { top: '#E0C3FC', bottom: '#9BB5FF', name: 'Purple Sky' },
-    { top: '#FFF1EB', bottom: '#ACE0F9', name: 'Sunset Cloud' },
-    { top: '#FFE5B4', bottom: '#FFCCCB', name: 'Warm Coral' },
-    { top: '#C1FBA4', bottom: '#7FB3D3', name: 'Nature Fresh' },
-    { top: '#F093FB', bottom: '#F5576C', name: 'Pink Passion' }
-  ];
-
   const handleIconUpload = async (file: File) => {
     if (file.size > 3 * 1024 * 1024) {
       toast.error('Kích thước file phải nhỏ hơn 3MB');
@@ -186,7 +175,7 @@ const CaptionBuilder: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 lg:h-[80vh]">
         {/* Editor Panel */}
-        <div className="space-y-4 sm:space-y-6 overflow-y-scroll">
+        <div className="space-y-4 sm:space-y-6 overflow-y-scroll scroll-smooth">
           <CaptionText value={captionText} onChange={setCaptionText} />
 
           {/* Icon Upload - Only for Members */}
@@ -289,7 +278,6 @@ const CaptionBuilder: React.FC = () => {
               setSelectedColorTop(top);
               setSelectedColorBottom(bottom);
             }}
-            gradientPresets={gradientPresets}
           />
 
           <TagsSection
