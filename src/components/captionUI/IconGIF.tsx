@@ -188,14 +188,26 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
             {/* Search Input */}
             <div className="flex items-center gap-2">
               <div className="flex-1 relative">
-                <input
+               <input
                   type="text"
                   value={searchQuery}
                   onChange={handleSearchChange}
                   placeholder="Search KLIPY..."
                   title="Tìm Gif trên KLIPY"
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm sm:text-base"
-                  disabled={loading}
+                  className="
+                    w-full
+                    px-3 sm:px-4
+                    py-2
+                    border border-gray-300 dark:border-gray-600
+                    rounded-lg
+                    focus:ring-2 focus:ring-pink-500 focus:border-transparent
+                    dark:bg-gray-700 dark:text-white
+                    text-base sm:text-sm
+                    select-text
+                    pointer-events-auto
+                  "
+                  readOnly={loading}
+                  aria-busy={loading}
                   onCompositionStart={handleCompositionStart}
                   onCompositionEnd={handleCompositionEnd}
                 />
