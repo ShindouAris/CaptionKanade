@@ -88,7 +88,7 @@ const Tutorial: React.FC = () => {
             width="100%"
             className="rounded-lg border border-pink-200 dark:border-gray-700 shadow"
           >
-            <source src="/locketdio.mp4" type="video/mp4" />
+            <source src="https://cdn.chisadin.site/locketdio.mp4" type="video/mp4" />
             Trình duyệt của bạn không hỗ trợ phát video.
           </video>
         </section>
