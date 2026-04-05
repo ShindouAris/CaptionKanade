@@ -1,4 +1,4 @@
-export const MAX_CAPTION_COLORS = 4;
+export const MAX_CAPTION_COLORS = 8;
 export const DEFAULT_CAPTION_COLORS = ['#FFDEE9', '#B5FFFC'];
 
 export const normalizeCaptionColors = (
