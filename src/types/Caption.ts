@@ -10,6 +10,7 @@ export interface Caption {
   color: string;
   colortop: string;
   colorbottom: string;
+  colors:  string[];
   created_at: string;
   updated_at: string;
   favorite_count?: number;
@@ -26,6 +27,7 @@ export interface CaptionCreateForm {
   color: string;
   colortop: string;
   colorbottom: string;
+  colors: string[];
 }
 
 export interface CaptionStyle {
@@ -33,6 +35,7 @@ export interface CaptionStyle {
   color: string;
   colortop: string;
   colorbottom: string;
+  colors?: string[];
   fontSize?: string;
   fontWeight?: string;
   textAlign?: 'left' | 'center' | 'right';

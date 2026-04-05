@@ -8,6 +8,7 @@ import { Caption } from "@/types/Caption";
 import {User} from "@/contexts/AuthContext"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import toast from "react-hot-toast";
+import { getCaptionGradient } from "@/lib/captionColors";
 
 interface CaptionProps {
   caption: Caption;
@@ -86,7 +87,7 @@ export const CaptionItem: React.FC<CaptionProps> = ({
               transition-all duration-300
             "
             style={{
-              background: `linear-gradient(to bottom, ${caption.colortop}, ${caption.colorbottom})`,
+              background: getCaptionGradient(caption.colors, [caption.colortop, caption.colorbottom]),
               color: caption.color,
               border: '2px solid rgba(255,255,255,0.3)',
             }}
@@ -232,7 +233,7 @@ export const CaptionItem: React.FC<CaptionProps> = ({
                   sm:min-h-[72px]
                 "
                 style={{
-                  background: `linear-gradient(to bottom, ${caption.colortop}, ${caption.colorbottom})`,
+                  background: getCaptionGradient(caption.colors, [caption.colortop, caption.colorbottom]),
                   color: caption.color,
                   border: '2px solid rgba(255,255,255,0.3)'
                 }}

@@ -15,6 +15,7 @@ export interface Caption {
   color: string;
   colortop: string;
   colorbottom: string;
+  colors: string[];
   created_at: string;
   updated_at: string;
   favorite_count?: number;

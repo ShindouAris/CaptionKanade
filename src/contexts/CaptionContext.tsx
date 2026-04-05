@@ -285,10 +285,15 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const addCaption = async (newCaption: Omit<Caption, 'id' | 'created_at' | 'updated_at'>): Promise<Caption> => {
     try {
       const formData = new FormData();
+      const captionColors = Array.isArray((newCaption as any).colors) && (newCaption as any).colors.length > 0
+        ? (newCaption as any).colors
+        : [newCaption.colortop, newCaption.colorbottom];
+
       formData.append('text', newCaption.text);
       formData.append('color', newCaption.color);
       formData.append('colortop', newCaption.colortop);
       formData.append('colorbottom', newCaption.colorbottom);
+      formData.append('colors', JSON.stringify(captionColors.slice(0, 4)));
       formData.append('author', newCaption.author);
       formData.append('type', newCaption.type);
       formData.append('is_private', String(newCaption.is_private ?? false));

@@ -1,5 +1,6 @@
 import React from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { getCaptionGradient } from "@/lib/captionColors";
 
 
 export const Preview = React.memo(({ 
@@ -7,16 +8,14 @@ export const Preview = React.memo(({
   onTogglePreview,
   captionText,
   selectedColor,
-  selectedColorTop,
-  selectedColorBottom,
+  selectedColors,
   iconPreview
 }: {
   showPreview: boolean;
   onTogglePreview: () => void;
   captionText: string;
   selectedColor: string;
-  selectedColorTop: string;
-  selectedColorBottom: string;
+  selectedColors: string[];
   iconPreview: string;
 }) => (
   <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-pink-200 dark:border-gray-600">
@@ -40,7 +39,7 @@ export const Preview = React.memo(({
         <div 
           className="w-full h-full"
           style={{
-            background: `linear-gradient(to bottom, ${selectedColorTop}, ${selectedColorBottom})`
+            background: getCaptionGradient(selectedColors)
           }}
         />
         
@@ -48,7 +47,7 @@ export const Preview = React.memo(({
           <div
             className="flex items-center gap-2 sm:gap-4 px-3 sm:px-6 py-2 sm:py-4 rounded-xl sm:rounded-2xl max-w-xs sm:max-w-sm"
             style={{
-              background: `linear-gradient(to bottom, ${selectedColorTop}, ${selectedColorBottom})`,
+              background: getCaptionGradient(selectedColors),
               color: selectedColor,
               fontSize: '14px',
               fontWeight: 'bold',

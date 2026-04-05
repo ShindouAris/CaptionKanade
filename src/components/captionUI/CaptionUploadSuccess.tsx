@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Caption } from "@/types/Caption";
 import { Sparkles, CheckCircle2 } from "lucide-react";
 import toast from "react-hot-toast";
+import { getCaptionGradient } from "@/lib/captionColors";
 
 interface CaptionUploadSuccessProps {
   open: boolean;
@@ -41,7 +42,7 @@ export const CaptionUploadSuccess: React.FC<CaptionUploadSuccessProps> = ({ open
                 <div
                   className="flex items-center gap-3 px-4 py-3 rounded-2xl backdrop-blur-sm"
                   style={{
-                    background: `linear-gradient(to bottom, ${caption.colortop}, ${caption.colorbottom})`,
+                    background: getCaptionGradient(caption.colors, [caption.colortop, caption.colorbottom]),
                     color: caption.color,
                     border: '2px solid rgba(255,255,255,0.3)'
                   }}

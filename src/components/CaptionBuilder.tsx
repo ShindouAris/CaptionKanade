@@ -16,6 +16,7 @@ import {IconUrlUpload} from './captionUI/IconUrlUpload';
 import { UploadConfig } from './captionUI/UploadConfig';
 import { IconUploadRecent } from './captionUI/IconUploadrecent';
 import { IconGIF } from './captionUI/IconGIF';
+import { DEFAULT_CAPTION_COLORS } from '@/lib/captionColors';
 import {
   Select,
   SelectContent,
@@ -30,8 +31,7 @@ const CaptionBuilder: React.FC = () => {
   const { user } = useAuth();
   const [captionText, setCaptionText] = useState('');
   const [selectedColor, setSelectedColor] = useState('#ffffff');
-  const [selectedColorTop, setSelectedColorTop] = useState('#FFDEE9');
-  const [selectedColorBottom, setSelectedColorBottom] = useState('#B5FFFC');
+  const [selectedColors, setSelectedColors] = useState<string[]>([...DEFAULT_CAPTION_COLORS]);
   const [iconFile, setIconFile] = useState<File | null>(null);
   const [iconPreview, setIconPreview] = useState<string>('');
   const [iconUrl, setIconUrl] = useState<string>('');
@@ -128,8 +128,9 @@ const CaptionBuilder: React.FC = () => {
         icon_file: iconFile || undefined,
         icon_link: iconUrl || undefined,
         color: selectedColor,
-        colortop: selectedColorTop,
-        colorbottom: selectedColorBottom,
+        colortop: selectedColors[0] ?? DEFAULT_CAPTION_COLORS[0],
+        colorbottom: selectedColors[selectedColors.length - 1] ?? DEFAULT_CAPTION_COLORS[1],
+        colors: selectedColors,
         is_favorite: false,
         is_private: isPrivate
       };
@@ -144,8 +145,7 @@ const CaptionBuilder: React.FC = () => {
       setIconPreview('');
       setIconUrl('')
       setSelectedColor('#ffffff');
-      setSelectedColorTop('#FFDEE9');
-      setSelectedColorBottom('#B5FFFC');
+      setSelectedColors([...DEFAULT_CAPTION_COLORS]);
       const event = new CustomEvent('caption-saved');
       window.dispatchEvent(event);
       await fetchUserQuota(); // Cập nhật lại quota sau khi upload
@@ -271,12 +271,10 @@ const CaptionBuilder: React.FC = () => {
 
           <StyleOptions
             selectedColor={selectedColor}
-            selectedColorTop={selectedColorTop}
-            selectedColorBottom={selectedColorBottom}
+            selectedColors={selectedColors}
             onColorChange={setSelectedColor}
-            onGradientChange={(top, bottom) => {
-              setSelectedColorTop(top);
-              setSelectedColorBottom(bottom);
+            onColorsChange={(colors) => {
+              setSelectedColors(colors);
             }}
           />
 
@@ -301,8 +299,7 @@ const CaptionBuilder: React.FC = () => {
             onTogglePreview={() => setShowPreview(!showPreview)}
             captionText={captionText}
             selectedColor={selectedColor}
-            selectedColorTop={selectedColorTop}
-            selectedColorBottom={selectedColorBottom}
+            selectedColors={selectedColors}
             iconPreview={iconPreview}
             />
 
