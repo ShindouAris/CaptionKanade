@@ -312,6 +312,16 @@ export const CaptionProvider: React.FC<{ children: React.ReactNode }> = ({ child
         formData.append('icon_link', icon_url)
       }
 
+      // Handle background image
+      const bgFile = (newCaption as any).bg_file as File | undefined;
+      if (bgFile) {
+        formData.append('background_image_url', bgFile);
+      }
+      const bgLink = (newCaption as any).bg_link as string | undefined;
+      if (bgLink) {
+        formData.append('background_image_link', bgLink);
+      }
+
       const response = await fetch(`${API_URL}/captions/create`, {
         method: 'POST',
         headers: accessToken ? { 'Authorization': `Bearer ${accessToken}` } : undefined,

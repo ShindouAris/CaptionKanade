@@ -16,6 +16,7 @@ import {IconUrlUpload} from './captionUI/IconUrlUpload';
 import { UploadConfig } from './captionUI/UploadConfig';
 import { IconUploadRecent } from './captionUI/IconUploadrecent';
 import { IconGIF } from './captionUI/IconGIF';
+import { BackgroundImageUpload } from './captionUI/BackgroundImageUpload';
 import { DEFAULT_CAPTION_COLORS } from '@/lib/captionColors';
 import {
   Select,
@@ -44,6 +45,32 @@ const CaptionBuilder: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isPrivate, setisPrivate] = useState(false)
   const [uploadMode, setUploadMode] = useState<'gif' | 'url' | 'recent' | 'file'>('gif');
+  const [bgFile, setBgFile] = useState<File | null>(null);
+  const [bgPreview, setBgPreview] = useState<string>('');
+  const [bgLink, setBgLink] = useState<string>('');
+  const [bgUploadMode, setBgUploadMode] = useState<'file' | 'url'>('file');
+
+  const handleBgFileUpload = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      setBgPreview(reader.result as string);
+      setBgFile(file);
+      setBgLink('');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleBgLinkUpload = (url: string) => {
+    setBgPreview(url);
+    setBgLink(url);
+    setBgFile(null);
+  };
+
+  const handleBgRemove = () => {
+    setBgFile(null);
+    setBgPreview('');
+    setBgLink('');
+  };
 
   const handleIconUpload = async (file: File) => {
     if (file.size > 3 * 1024 * 1024) {
@@ -119,7 +146,7 @@ const CaptionBuilder: React.FC = () => {
     }
     setIsSubmitting(true);
     try {
-      const captionData: Omit<Caption, 'id' | 'created_at' | 'updated_at'> & { icon_file?: File } = {
+      const captionData: Omit<Caption, 'id' | 'created_at' | 'updated_at'> & { icon_file?: File; bg_file?: File; bg_link?: string } = {
         text: captionText.trim() || '',
         tags: tags.length > 0 ? tags : null,
         author: user.id,
@@ -132,7 +159,9 @@ const CaptionBuilder: React.FC = () => {
         colorbottom: selectedColors[selectedColors.length - 1] ?? DEFAULT_CAPTION_COLORS[1],
         colors: selectedColors,
         is_favorite: false,
-        is_private: isPrivate
+        is_private: isPrivate,
+        bg_file: bgFile || undefined,
+        bg_link: bgLink || undefined,
       };
       const saved = await addCaption(captionData);
       setUploadedCaption(saved);
@@ -146,6 +175,9 @@ const CaptionBuilder: React.FC = () => {
       setIconUrl('')
       setSelectedColor('#ffffff');
       setSelectedColors([...DEFAULT_CAPTION_COLORS]);
+      setBgFile(null);
+      setBgPreview('');
+      setBgLink('');
       const event = new CustomEvent('caption-saved');
       window.dispatchEvent(event);
       await fetchUserQuota(); // Cập nhật lại quota sau khi upload
@@ -254,6 +286,22 @@ const CaptionBuilder: React.FC = () => {
             )}
           </div>
 
+          {/* Background Image Upload [disabled for now] */}
+          {captionUser.isMember && (
+            <BackgroundImageUpload
+              bgFile={bgFile}
+              bgPreview={bgPreview}
+              bgLink={bgLink}
+              isUploading={isUploading}
+              onUploadFile={handleBgFileUpload}
+              onUploadLink={handleBgLinkUpload}
+              onRemove={handleBgRemove}
+              remainingQuota={remainingIconQuota}
+              mode={bgUploadMode}
+              onModeChange={setBgUploadMode}
+            />
+          )}
+
           {/* Non-member notice */}
           {captionUser.isMember && (
             <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-yellow-200 dark:border-yellow-700">
@@ -301,6 +349,7 @@ const CaptionBuilder: React.FC = () => {
             selectedColor={selectedColor}
             selectedColors={selectedColors}
             iconPreview={iconPreview}
+            bgPreview={bgPreview}
             />
 
           {/* Actions */}

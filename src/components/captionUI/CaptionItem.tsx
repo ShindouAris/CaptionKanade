@@ -82,7 +82,7 @@ export const CaptionItem: React.FC<CaptionProps> = ({
         <div className="absolute inset-0 flex items-center justify-center p-6 lg:p-8">
           <div 
             className="
-              flex items-center gap-3 px-4 py-2 rounded-full max-w-full backdrop-blur-sm
+              relative flex items-center gap-3 px-4 py-2 rounded-full max-w-full backdrop-blur-sm overflow-hidden
               lg:px-6 lg:py-3 lg:gap-5
               transition-all duration-300
             "
@@ -92,18 +92,26 @@ export const CaptionItem: React.FC<CaptionProps> = ({
               border: '2px solid rgba(255,255,255,0.3)',
             }}
           >
+            {caption.background_image_url && (
+              <img
+                src={caption.background_image_url}
+                alt="Background"
+                className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                loading="lazy"
+              />
+            )}
             {caption.icon_url && (
               <img 
                 src={caption.icon_url} 
                 alt="Icon" 
-                className="w-5 h-5 rounded-md object-cover flex-shrink-0
+                className="relative w-5 h-5 rounded-md object-cover flex-shrink-0
                   lg:w-8 lg:h-8
                 " 
               />
             )}
             {/* Bọc span trong một div có overflow-x-hidden và width cố định để marquee không chạy qua ảnh */}
             <div 
-              className="overflow-x-hidden"
+              className="relative overflow-x-hidden"
               style={{
                 maxWidth: '12rem', // max-w-48 ~ 192px
                 flex: 1,
@@ -225,10 +233,10 @@ export const CaptionItem: React.FC<CaptionProps> = ({
             >
               <div 
                 className="
-                  flex items-center gap-3 
+                  relative flex items-center gap-3 
                   px-6 py-2.5 
                   rounded-3xl max-w-full 
-                  backdrop-blur-sm
+                  backdrop-blur-sm overflow-hidden
                   sm:px-9 sm:py-4.5 sm:gap-[21.6px]
                   sm:min-h-[72px]
                 "
@@ -238,15 +246,23 @@ export const CaptionItem: React.FC<CaptionProps> = ({
                   border: '2px solid rgba(255,255,255,0.3)'
                 }}
               >
+                {caption.background_image_url && (
+                  <img
+                    src={caption.background_image_url}
+                    alt="Background"
+                    className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                    loading="lazy"
+                  />
+                )}
                 {caption.icon_url && (
                   <img 
                     src={caption.icon_url} 
                     alt="Icon" 
-                    className="w-10 h-10 sm:w-8 sm:h-8 rounded-md object-cover flex-shrink-0" 
+                    className="relative w-10 h-10 sm:w-8 sm:h-8 rounded-md object-cover flex-shrink-0" 
                   />
                 )}
                 <span 
-                  className="text-md sm:text-xl font-bold truncate max-w-48 sm:max-w-xs"
+                  className="relative text-md sm:text-xl font-bold truncate max-w-48 sm:max-w-xs"
                   style={{ color: caption.color }}
                 >
                   {caption.text.trim() || 'Caption Kanade'}

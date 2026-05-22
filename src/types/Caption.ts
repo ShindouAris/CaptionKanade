@@ -6,6 +6,7 @@ export interface Caption {
   icon_url?: string;
   icon_link?: string;
   icon_delete_link?: string;
+  background_image_url?: string | null;
   tags: string[] | null;
   color: string;
   colortop: string;

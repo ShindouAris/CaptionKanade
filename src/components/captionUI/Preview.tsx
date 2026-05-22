@@ -9,7 +9,8 @@ export const Preview = React.memo(({
   captionText,
   selectedColor,
   selectedColors,
-  iconPreview
+  iconPreview,
+  bgPreview,
 }: {
   showPreview: boolean;
   onTogglePreview: () => void;
@@ -17,6 +18,7 @@ export const Preview = React.memo(({
   selectedColor: string;
   selectedColors: string[];
   iconPreview: string;
+  bgPreview?: string;
 }) => (
   <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-pink-200 dark:border-gray-600">
     <div className="flex items-center justify-between mb-3 sm:mb-4">
@@ -39,13 +41,13 @@ export const Preview = React.memo(({
         <div 
           className="w-full h-full"
           style={{
-            background: getCaptionGradient(selectedColors)
+            background: getCaptionGradient(selectedColors),
           }}
         />
         
         <div className="absolute inset-0 flex items-center justify-center p-2 sm:p-4">
           <div
-            className="flex items-center gap-2 sm:gap-4 px-3 sm:px-6 py-2 sm:py-4 rounded-xl sm:rounded-2xl max-w-xs sm:max-w-sm"
+            className="relative flex items-center gap-2 sm:gap-4 px-3 sm:px-6 py-2 sm:py-4 rounded-xl sm:rounded-2xl max-w-xs sm:max-w-sm overflow-hidden"
             style={{
               background: getCaptionGradient(selectedColors),
               color: selectedColor,
@@ -54,15 +56,23 @@ export const Preview = React.memo(({
               border: '2px solid rgba(255,255,255,0.3)'
             }}
           >
+            {bgPreview && (
+              <img
+                src={bgPreview}
+                alt="Background"
+                className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                loading="lazy"
+              />
+            )}
             {iconPreview && (
               <img 
                 src={iconPreview} 
                 alt="Icon" 
-                className="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover flex-shrink-0"
+                className="relative w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover flex-shrink-0"
                 loading="lazy"
               />
             )}
-            <span className="text-center text-xs sm:text-base">
+            <span className="relative text-center text-xs sm:text-base">
               {captionText || 'Caption Kanade'}
             </span>
           </div>

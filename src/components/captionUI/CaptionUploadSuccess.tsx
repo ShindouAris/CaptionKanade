@@ -40,21 +40,29 @@ export const CaptionUploadSuccess: React.FC<CaptionUploadSuccessProps> = ({ open
                   <Sparkles className="w-4 h-4 text-white/70" />
                 </div>
                 <div
-                  className="flex items-center gap-3 px-4 py-3 rounded-2xl backdrop-blur-sm"
+                  className="relative flex items-center gap-3 px-4 py-3 rounded-2xl backdrop-blur-sm overflow-hidden"
                   style={{
                     background: getCaptionGradient(caption.colors, [caption.colortop, caption.colorbottom]),
                     color: caption.color,
                     border: '2px solid rgba(255,255,255,0.3)'
                   }}
                 >
+                  {caption.background_image_url && (
+                    <img
+                      src={caption.background_image_url}
+                      alt="Background"
+                      className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+                      loading="lazy"
+                    />
+                  )}
                   {caption.icon_url && (
                     <img
                       src={caption.icon_url}
                       alt="Icon"
-                      className="w-6 h-6 rounded-full object-cover flex-shrink-0"
+                      className="relative w-6 h-6 rounded-full object-cover flex-shrink-0"
                     />
                   )}
-                  <span className="text-sm font-bold truncate max-w-48" style={{ color: caption.color }}>
+                  <span className="relative text-sm font-bold truncate max-w-48" style={{ color: caption.color }}>
                     {caption.text.length > 40 ? `${caption.text.substring(0, 40)}...` : caption.text.trim() || 'Caption Kanade'}
                   </span>
                 </div>
