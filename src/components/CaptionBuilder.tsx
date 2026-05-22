@@ -286,8 +286,8 @@ const CaptionBuilder: React.FC = () => {
             )}
           </div>
 
-          {/* Background Image Upload [disabled for now] */}
-          {captionUser.isMember && (
+          {/* Background Image Upload [disabled for everyone except admin] */}
+          {captionUser.isMember || user?.id === "0fd2189f-1873-42bb-b2c8-6443772d12e3" && (
             <BackgroundImageUpload
               bgFile={bgFile}
               bgPreview={bgPreview}
