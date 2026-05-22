@@ -329,9 +329,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#F6B1CE] via-sky-100 to-[#B3BFFF] dark:from-[#6F00FF] dark:via-[#FFB8E0] dark:to-[#4E56C0] transition-all duration-300">
       {/* Banner lên lịch bảo trì */}
-      <div className="bg-red-600 text-white p-4 text-center">
+      {/* <div className="bg-red-600 text-white p-4 text-center">
           ⚠️ Cảnh báo: Hệ thống đang bảo trì, dữ liệu sau bảo trì sẽ chỉ được bảo lưu đến 21:00 ngày 22/5/2026.
-        </div>
+        </div> */}
       <div className="flex h-screen">
         <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
         <div className="flex-1 flex flex-col lg:ml-0 overflow-hidden">
