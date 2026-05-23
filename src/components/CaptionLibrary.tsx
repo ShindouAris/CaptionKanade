@@ -129,7 +129,7 @@ const CaptionLibrary: React.FC = () => {
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-pink-200 dark:border-gray-600 mb-8">
+      <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-primary/20 dark:border-gray-600 mb-8">
         <div className="flex flex-col md:flex-row gap-4 mb-4">
           <div className="flex-1 flex gap-2">
             <div className="relative flex-1">
@@ -140,13 +140,13 @@ const CaptionLibrary: React.FC = () => {
                 value={searchInput}
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               />
             </div>
             <button
               onClick={handleSearch}
               disabled={isLoading}
-              className="px-6 py-3 bg-pink-500 text-white rounded-xl hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               <Search size={20} />
               Tìm kiếm
@@ -155,7 +155,7 @@ const CaptionLibrary: React.FC = () => {
           
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-3 bg-pink-500 text-white rounded-xl hover:bg-pink-600 transition-colors"
+            className="flex items-center gap-2 px-4 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors"
           >
             <Filter size={20} />
             Bộ lọc
@@ -172,7 +172,7 @@ const CaptionLibrary: React.FC = () => {
                   onClick={() => handleSort(sort as any)}
                   className={`px-3 py-2 rounded-lg transition-colors ${
                     filter.sortBy === sort
-                      ? 'bg-pink-500 text-white'
+                      ? 'bg-primary text-white'
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
@@ -193,7 +193,7 @@ const CaptionLibrary: React.FC = () => {
                       onClick={() => handleTagFilter(tag)}
                       className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-colors ${
                         filter.tags.includes(tag)
-                          ? 'bg-pink-500 text-white'
+                          ? 'bg-primary text-white'
                           : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                       }`}
                     >
@@ -214,7 +214,7 @@ const CaptionLibrary: React.FC = () => {
           Truy cập trang hướng dẫn ở sidebar hoặc&nbsp;
           <a
             href="/tutorial"
-            className="underline text-pink-600 hover:text-pink-800 transition-colors"
+            className="underline text-primary hover:text-primary/80 transition-colors"
             style={{ cursor: 'pointer' }}
           >
             Vào đây
@@ -242,7 +242,7 @@ const CaptionLibrary: React.FC = () => {
           </p>
           <button
             onClick={() => fetchCaptions(currentPage)}
-            className="px-6 py-3 bg-pink-500 text-white rounded-xl font-semibold hover:bg-pink-600 transition-all"
+            className="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-all"
           >
             Thử lại
           </button>
@@ -266,7 +266,7 @@ const CaptionLibrary: React.FC = () => {
           {!(filter.searchQuery || filter.tags.length > 0) && (
             <button
               onClick={() => window.dispatchEvent(new CustomEvent('navigate-to-builder'))}
-              className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-xl font-semibold hover:from-pink-600 hover:to-purple-700 transition-all"
+              className="px-6 py-3 bg-gradient-to-r from-primary to-accent text-white rounded-xl font-semibold hover:from-primary/90 hover:to-accent/90 transition-all"
             >
               Tạo Caption Ngay
             </button>
@@ -295,7 +295,7 @@ const CaptionLibrary: React.FC = () => {
                 <button
                   onClick={loadMore}
                   disabled={isLoading}
-                  className="px-6 py-3 bg-pink-500 text-white rounded-xl hover:bg-pink-600 transition-colors disabled:opacity-50"
+                  className="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50"
                 >
                   {isLoading ? 'Đang tải...' : 'Tải thêm'}
                 </button>

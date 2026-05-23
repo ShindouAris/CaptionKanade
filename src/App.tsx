@@ -91,14 +91,13 @@ const SidebarContent: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) =
       <div className="p-6 border-b">
         <Link 
           to="/" 
-          className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent"
+          className="text-2xl font-bold"
         >
           <GradientText 
           yoyo={false}
           className='font-bold'
           animationSpeed={2}
-          colors={["#F6B1CE", "#1581BF", "#B3BFFF", "#450693"]}
-
+          colors={["#9A7FE0", "#B7C0E8", "#8CAAEE", "#ED7A9E"]}
           >
             CaptionKanade
           </GradientText>
@@ -114,7 +113,7 @@ const SidebarContent: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) =
               variant={location.pathname === id ? "secondary" : "ghost"}
               className={cn(
                 "w-full justify-start h-12 px-4",
-                location.pathname === id && "bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 hover:bg-pink-200 dark:hover:bg-pink-900/40"
+                location.pathname === id && "bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary hover:bg-primary/20 dark:hover:bg-primary/30"
               )}
               asChild
             >
@@ -168,7 +167,7 @@ const SidebarContent: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) =
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src="/avatar.png" />
-                    <AvatarFallback className="bg-pink-100 text-pink-700 text-xs font-semibold">
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
                       {getUserInitials(user)}
                     </AvatarFallback>
                   </Avatar>
@@ -183,7 +182,7 @@ const SidebarContent: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) =
                         </Badge>
                       )}
                       {user?.id === "0fd2189f-1873-42bb-b2c8-6443772d12e3" && (
-                        <Badge variant="secondary" className="text-xs px-2 py-0 bg-gradient-to-r from-pink-300 to-blue-300 text-white h-5 flex items-center">
+                        <Badge variant="secondary" className="text-xs px-2 py-0 bg-gradient-to-r from-primary to-accent text-primary-foreground h-5 flex items-center">
                           Admin - Developer
                         </Badge>
                       )}
@@ -195,7 +194,7 @@ const SidebarContent: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) =
 
             <Button 
               variant="ghost" 
-              className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/20"
+              className="w-full justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
               onClick={logout}
             >
               <LogOut className="mr-3 h-4 w-4" />
@@ -204,7 +203,7 @@ const SidebarContent: React.FC<{ onNavigate?: () => void }> = ({ onNavigate }) =
           </div>
         ) : (
           <div className="space-y-2">
-            <Button className="w-full bg-pink-500 hover:bg-pink-600" asChild>
+            <Button className="w-full bg-primary hover:bg-primary/90" asChild>
               <Link to="/login" onClick={onNavigate}>Đăng nhập</Link>
             </Button>
             <Button variant="outline" className="w-full" asChild>
@@ -296,14 +295,13 @@ const TopBar: React.FC<TopBarProps> = ({ toggleSidebar }) => {
         
         <Link 
           to="/" 
-          className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent"
+          className="text-xl font-bold"
         >
           <GradientText 
           yoyo={false}
           className='font-bold'
           animationSpeed={2}
-          colors={["#F6B1CE", "#1581BF", "#B3BFFF", "#450693"]}
-
+          colors={["#9A7FE0", "#B7C0E8", "#8CAAEE", "#ED7A9E"]}
           >
             CaptionKanade
           </GradientText>
@@ -327,7 +325,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F6B1CE] via-sky-100 to-[#B3BFFF] dark:from-[#6F00FF] dark:via-[#FFB8E0] dark:to-[#4E56C0] transition-all duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-[#F2E8F8] via-[#E8F0FE] to-[#DCE0E8] dark:from-[#2A1F3D] dark:via-[#1E2A3D] dark:to-[#1E1E2E] transition-all duration-300">
       {/* Banner lên lịch bảo trì */}
       {/* <div className="bg-red-600 text-white p-4 text-center">
           ⚠️ Cảnh báo: Hệ thống đang bảo trì, dữ liệu sau bảo trì sẽ chỉ được bảo lưu đến 21:00 ngày 22/5/2026.

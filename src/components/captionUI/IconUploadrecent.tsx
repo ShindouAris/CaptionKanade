@@ -102,10 +102,10 @@ export const IconUploadRecent: React.FC<IconUploadRecentProps> = React.memo(
     };
 
     return (
-      <div className="p-[2px] rounded-xl sm:rounded-2xl bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-pink-200 dark:border-gray-600">
+      <div className="p-[2px] rounded-xl sm:rounded-2xl bg-gradient-to-r from-primary to-accent">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-primary/20 dark:border-gray-600">
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
-            <ImageIcon className="text-pink-600 dark:text-pink-400" size={18} />
+            <ImageIcon className="text-primary dark:text-primary" size={18} />
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Icon Caption</h3>
             <Crown className="text-yellow-500" size={14} />
           </div>
@@ -145,8 +145,8 @@ export const IconUploadRecent: React.FC<IconUploadRecentProps> = React.memo(
                     onClick={() => handleRecentImageClick(image.url)}
                     className={`relative w-full aspect-square rounded-lg overflow-hidden border-2 transition-colors group ${
                       previewUrl === image.url 
-                        ? 'border-pink-500 ring-2 ring-pink-300' 
-                        : 'border-transparent hover:border-pink-400'
+                        ? 'border-primary ring-2 ring-primary' 
+                        : 'border-transparent hover:border-primary/60'
                     }`}
                   >
                     <img
@@ -157,7 +157,7 @@ export const IconUploadRecent: React.FC<IconUploadRecentProps> = React.memo(
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                     {previewUrl === image.url && (
-                      <div className="absolute top-1 right-1 bg-pink-500 text-white rounded-full w-4 h-4 flex items-center justify-center">
+                      <div className="absolute top-1 right-1 bg-primary text-white rounded-full w-4 h-4 flex items-center justify-center">
                         <CheckCircle size={12} />
                       </div>
                     )}

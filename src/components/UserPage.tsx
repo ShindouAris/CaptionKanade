@@ -130,7 +130,7 @@ const ScrollToTopButton: React.FC = () => {
     isVisible && (
       <span
         onClick={scrollToTop}
-        className="fixed bottom-8 right-8 h-15 py-5 px-5 rounded-3xl bg-pink-500 text-white shadow-lg hover:bg-pink-600 transition z-[9999]"
+        className="fixed bottom-8 right-8 h-15 py-5 px-5 rounded-3xl bg-primary text-white shadow-lg hover:bg-primary/90 transition z-[9999]"
       >
         <div>
         ↑
@@ -230,7 +230,7 @@ const UserPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/5 to-indigo-50 dark:from-gray-900 dark:via-accent/10 dark:to-indigo-900 py-12 px-4">
       <ScrollToTopButton />
       <div className="max-w-4xl mx-auto">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
@@ -239,7 +239,7 @@ const UserPage: React.FC = () => {
             <img src='/banners/banner.jpg' alt="Banner" className="w-full h-full object-cover" />
             <div className="absolute -bottom-12 left-8">
               <div className="w-24 h-24 rounded-full bg-white dark:bg-gray-700 p-1">
-                <div className="w-full h-full rounded-full bg-gradient-to-r from-pink-500 to-purple-600 flex items-center justify-center">
+                <div className="w-full h-full rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center">
                   <img src="/avatar.png" alt="Logo" className="w-20 h-20 mx-auto rounded-full" />
                 </div>
               </div>
@@ -262,19 +262,19 @@ const UserPage: React.FC = () => {
 
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                    <Mail className="w-5 h-5 text-pink-500" />
+                    <Mail className="w-5 h-5 text-primary" />
                     <span>{userInfo.email}</span>
                   </div>
 
                   {userInfo.username ? (
                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                      <FaThreads className="w-5 h-5 text-pink-500" />
+                      <FaThreads className="w-5 h-5 text-primary" />
                       <span>{userInfo.username || 'N/A'}</span>
                       <Change_UserName />
                     </div>
                   ) : (
                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                      <FaThreads className="w-5 h-5 text-pink-500" />
+                      <FaThreads className="w-5 h-5 text-primary" />
                       Chưa có tên người dùng
                       <Change_UserName />
                     </div>
@@ -282,12 +282,12 @@ const UserPage: React.FC = () => {
                   
 
                   <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                    <Hash className="w-5 h-5 text-pink-500" />
+                    <Hash className="w-5 h-5 text-primary" />
                     <span className="font-mono text-sm">{userInfo.id}</span>
                   </div>
 
                   <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                    <Calendar className="w-5 h-5 text-pink-500" />
+                    <Calendar className="w-5 h-5 text-primary" />
                     <span>Tham gia {formatDate(userInfo.created_at)}</span>
                   </div>
                 </div>
@@ -369,14 +369,14 @@ const UserPage: React.FC = () => {
                   <button
                     onClick={handleRefresh}
                     disabled={isRefreshing}
-                    className="p-2 text-pink-500 hover:text-pink-600 disabled:text-gray-400 transition-colors"
+                    className="p-2 text-primary hover:text-primary/90 disabled:text-gray-400 transition-colors"
                     title="Refresh statistics"
                   >
                     <RefreshCw className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
                   </button>
                 </div>
 
-                <div className="p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg">
+                <div className="p-4 bg-primary/5 dark:bg-primary/20 rounded-lg">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="text-4xl font-bold text-green-600 dark:text-green-400">
                     {userInfo.posted_count}
@@ -396,10 +396,10 @@ const UserPage: React.FC = () => {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <div className="text-4xl font-bold text-pink-600 dark:text-pink-400">
+                  <div className="text-4xl font-bold text-primary dark:text-primary">
                     {userInfo.favorites_received}
                   </div>
-                  <div className="text-sm text-pink-600 dark:text-pink-400">
+                  <div className="text-sm text-primary dark:text-primary">
                     Số yêu thích nhận được
                   </div>
                   </div>
@@ -419,7 +419,7 @@ const UserPage: React.FC = () => {
 
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                    <FiDollarSign className="w-5 h-5 text-pink-500" />
+                    <FiDollarSign className="w-5 h-5 text-primary" />
                     <span>
                       Plan: {userInfo.plan_name || 'Dev lười quá chưa làm :('}
                     </span>
@@ -427,7 +427,7 @@ const UserPage: React.FC = () => {
 
                   {userInfo.expired_at && (
                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-                      <Clock className="w-5 h-5 text-pink-500" />
+                      <Clock className="w-5 h-5 text-primary" />
                       <span>
                         Expires: hôm nay 💀💀
                       </span>

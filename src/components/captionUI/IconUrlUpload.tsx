@@ -175,10 +175,10 @@ export const IconUrlUpload: React.FC<IconUrlUploadProps> = React.memo(
     };
 
     return (
-      <div className="p-[2px] rounded-xl sm:rounded-2xl bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-pink-200 dark:border-gray-600">
+      <div className="p-[2px] rounded-xl sm:rounded-2xl bg-gradient-to-r from-primary to-accent">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-primary/20 dark:border-gray-600">
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
-            <ImageIcon className="text-pink-600 dark:text-pink-400" size={18} />
+            <ImageIcon className="text-primary dark:text-primary" size={18} />
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Icon Caption</h3>
           </div>
 
@@ -191,12 +191,12 @@ export const IconUrlUpload: React.FC<IconUrlUploadProps> = React.memo(
                     value={imageUrl}
                     onChange={handleUrlChange}
                     placeholder="Nhập URL ảnh (ví dụ: https://example.com/image.png)"
-                    className="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm sm:text-base"
+                    className="w-full px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent dark:bg-gray-700 dark:text-white text-sm sm:text-base"
                     disabled={isUploading || isValidating}
                   />
                   {isValidating && (
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-pink-500"></div>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
                     </div>
                   )}
                   {isValidUrl && !isValidating && (
@@ -218,7 +218,7 @@ export const IconUrlUpload: React.FC<IconUrlUploadProps> = React.memo(
             <button
               onClick={handleApply}
               disabled={isUploading || !isValidUrl || isValidating}
-              className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+              className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
               aria-label="Apply image URL"
             >
               <Link size={16} />

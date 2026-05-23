@@ -170,10 +170,10 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
     };
 
     return (
-      <div className="p-[2px] rounded-xl sm:rounded-2xl bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-pink-200 dark:border-gray-600">
+      <div className="p-[2px] rounded-xl sm:rounded-2xl bg-gradient-to-r from-primary to-accent">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-primary/20 dark:border-gray-600">
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
-            <PiGifFill className="text-pink-600 dark:text-pink-400" size={18} />
+            <PiGifFill className="text-primary dark:text-primary" size={18} />
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Icon GIF</h3>
             <Badge variant="secondary" className="ml-auto px-2 py-1 text-xs">
               Beta
@@ -200,7 +200,7 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
                     py-2
                     border border-gray-300 dark:border-gray-600
                     rounded-lg
-                    focus:ring-2 focus:ring-pink-500 focus:border-transparent
+                    focus:ring-2 focus:ring-primary focus:border-transparent
                     dark:bg-gray-700 dark:text-white
                     text-base sm:text-sm
                     select-text
@@ -213,7 +213,7 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
                 />
                 {loading && (
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-pink-500"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
                   </div>
                 )}
               </div>
@@ -229,7 +229,7 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
 
             {/* Preview */}
             {previewUrl && (
-              <div className="flex items-center gap-2 p-2 bg-pink-50 dark:bg-pink-900/20 rounded-lg">
+              <div className="flex items-center gap-2 p-2 bg-primary/5 dark:bg-primary/20 rounded-lg">
                 <img src={previewUrl} alt="Icon preview" className="w-10 h-10 rounded-lg object-cover" loading="lazy" />
                 <span className="text-xs text-gray-600 dark:text-gray-400 flex-1">GIF đã chọn</span>
                 <button onClick={handleRemove} className="text-red-500 hover:text-red-700" aria-label="Remove icon">
@@ -258,8 +258,8 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
                         onClick={() => handleGifClick(gif.file.sm.gif.url)}
                         className={`relative w-full aspect-square rounded-lg overflow-hidden border-2 transition-all group ${
                           previewUrl === gif.file.sm.gif.url 
-                            ? 'border-pink-500 ring-2 ring-pink-300' 
-                            : 'border-transparent hover:border-pink-400'
+                            ? 'border-primary ring-2 ring-primary' 
+                            : 'border-transparent hover:border-primary/60'
                         }`}
                         title={gif.title}
                       >
@@ -271,7 +271,7 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
                         />
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
                         {previewUrl === gif.file.sm.gif.url && (
-                          <div className="absolute top-1 right-1 bg-pink-500 text-white rounded-full w-5 h-5 flex items-center justify-center">
+                          <div className="absolute top-1 right-1 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center">
                             <CheckCircle size={14} />
                           </div>
                         )}
@@ -284,7 +284,7 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
                     <button
                       onClick={handlePrevPage}
                       disabled={currentPage === 1}
-                      className="flex items-center gap-1 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-pink-500 dark:hover:text-pink-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="flex items-center gap-1 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                       aria-label="Previous page"
                     >
                       <ChevronLeft size={14} />
@@ -298,7 +298,7 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
                     <button
                       onClick={handleNextPage}
                       disabled={!data.has_next}
-                      className="flex items-center gap-1 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-pink-500 dark:hover:text-pink-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="flex items-center gap-1 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary disabled:opacity-30 disabled:cursor-not-allowed transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                       aria-label="Next page"
                     >
                       Sau
@@ -311,7 +311,7 @@ export const IconGIF: React.FC<IconGIFProps> = React.memo(
                   <div className="mb-2">Không tìm thấy GIF nào</div>
                   <button 
                     onClick={handleRefresh}
-                    className="px-4 py-2 bg-pink-500 text-white rounded-lg text-xs hover:bg-pink-600 transition-colors"
+                    className="px-4 py-2 bg-primary text-white rounded-lg text-xs hover:bg-primary/90 transition-colors"
                   >
                     Tải lại
                   </button>

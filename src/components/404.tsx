@@ -9,10 +9,10 @@ const NotFoundPage: React.FC = () => {
       <div className="max-w-2xl mx-auto text-center">
         {/* 404 Number with Animation */}
         <div className="relative mb-8">
-          <h1 className="text-9xl md:text-[12rem] font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 bg-clip-text text-transparent animate-pulse">
+          <h1 className="text-9xl md:text-[12rem] font-bold bg-gradient-to-r from-primary via-accent to-indigo-600 bg-clip-text text-transparent animate-pulse">
             404
           </h1>
-          <div className="absolute inset-0 bg-gradient-to-r from-pink-500/20 via-purple-500/20 to-indigo-600/20 blur-3xl rounded-full animate-ping"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-accent/20 to-indigo-600/20 blur-3xl rounded-full animate-ping"></div>
         </div>
 
         {/* Error Icon */}
@@ -37,7 +37,7 @@ const NotFoundPage: React.FC = () => {
           <Button 
             asChild
             size="lg"
-            className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
             <Link to="/" className="flex items-center gap-2">
               <Home className="w-5 h-5" />
@@ -73,8 +73,8 @@ const NotFoundPage: React.FC = () => {
 
         {/* Decorative Elements */}
         <div className="mt-12 flex justify-center space-x-4 opacity-30">
-          <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce"></div>
-          <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+          <div className="w-2 h-2 bg-accent rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
           <div className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
         </div>
 

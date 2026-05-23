@@ -150,7 +150,7 @@ export const CaptionItem: React.FC<CaptionProps> = ({
             {caption.tags.slice(0, 3).map(tag => (
               <Badge 
                 key={tag}
-                className="bg-gradient-to-r from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 text-pink-600 dark:text-pink-400 border border-pink-200/50 dark:border-pink-800/50"
+                className="bg-gradient-to-r from-primary/5 to-accent/5 dark:from-primary/20 dark:to-accent/20 text-primary dark:text-primary border border-primary/20 dark:border-primary/30"
               >
                 <Tag size={10} />
                 {tag}
@@ -187,7 +187,7 @@ export const CaptionItem: React.FC<CaptionProps> = ({
                 onClick={() => toggleFavorite(caption.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
                   caption.is_favorite
-                    ? 'bg-gradient-to-r from-pink-500 to-red-500 text-white shadow-lg shadow-pink-500/25 hover:shadow-pink-500/40'
+                    ? 'bg-gradient-to-r from-primary to-red-500 text-white shadow-lg shadow-primary/25 hover:shadow-primary/40'
                     : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:scale-105'
                 }`}
               >
@@ -219,7 +219,7 @@ export const CaptionItem: React.FC<CaptionProps> = ({
       </div>
 
       {/* Subtle hover effect overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl" />
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl" />
     </div>
     <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-4xl p-0 overflow-hidden">
@@ -289,7 +289,7 @@ export const CaptionItem: React.FC<CaptionProps> = ({
             {caption.tags && caption.tags?.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {caption.tags?.map(tag => (
-                  <Badge key={tag} className="bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400">
+                  <Badge key={tag} className="bg-primary/5 dark:bg-primary/20 text-primary dark:text-primary">
                     #{tag}
                   </Badge>
                 ))}

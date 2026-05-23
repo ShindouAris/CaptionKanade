@@ -20,17 +20,17 @@ export const Preview = React.memo(({
   iconPreview: string;
   bgPreview?: string;
 }) => (
-  <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-pink-200 dark:border-gray-600">
+  <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-primary/20 dark:border-gray-600">
     <div className="flex items-center justify-between mb-3 sm:mb-4">
       <div className="flex items-center gap-2">
-        <Eye className="text-pink-600 dark:text-pink-400" size={18} />
+        <Eye className="text-primary dark:text-primary" size={18} />
         <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
           Xem trước
         </h3>
       </div>
       <button
         onClick={onTogglePreview}
-        className="p-2 text-gray-500 hover:text-pink-600 dark:hover:text-pink-400 transition-colors"
+        className="p-2 text-gray-500 hover:text-primary dark:hover:text-primary transition-colors"
       >
         {showPreview ? <EyeOff size={18} /> : <Eye size={18} />}
       </button>

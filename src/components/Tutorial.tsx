@@ -19,7 +19,7 @@ const Tutorial: React.FC = () => {
     <div className="p-6 md:p-10">
       <div className="max-w-6xl mx-auto space-y-10">
         <header className="text-center space-y-3">
-          <h1 className="text-3xl md:text-5xl font-extrabold bg-gradient-to-r from-pink-400 via-red-300 to-blue-300 bg-clip-text text-transparent">
+          <h1 className="text-3xl md:text-5xl font-extrabold bg-gradient-to-r from-primary via-red-300 to-blue-300 bg-clip-text text-transparent">
             Hướng dẫn nhanh
           </h1>
           <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
@@ -28,7 +28,7 @@ const Tutorial: React.FC = () => {
         </header>
 
         <section className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-pink-200 dark:border-gray-700 shadow-sm">
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-primary/20 dark:border-gray-700 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
               Các bước cơ bản
             </h2>
@@ -36,9 +36,9 @@ const Tutorial: React.FC = () => {
               {mockSteps.map((step) => (
                 <li
                   key={step.id}
-                  className="flex gap-4 items-start bg-white/70 dark:bg-gray-800/70 rounded-xl p-4 border border-pink-100 dark:border-gray-700"
+                  className="flex gap-4 items-start bg-white/70 dark:bg-gray-800/70 rounded-xl p-4 border border-primary/10 dark:border-gray-700"
                 >
-                  <span className="h-8 w-8 shrink-0 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 text-white flex items-center justify-center font-bold">
+                  <span className="h-8 w-8 shrink-0 rounded-full bg-gradient-to-r from-primary to-accent text-white flex items-center justify-center font-bold">
                     {step.id}
                   </span>
                   <div>
@@ -50,7 +50,7 @@ const Tutorial: React.FC = () => {
             </ol>
           </div>
 
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-pink-200 dark:border-gray-700 shadow-sm">
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 border border-primary/20 dark:border-gray-700 shadow-sm">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
               Mẹo nhanh
             </h2>
@@ -86,7 +86,7 @@ const Tutorial: React.FC = () => {
           <video
             controls
             width="100%"
-            className="rounded-lg border border-pink-200 dark:border-gray-700 shadow"
+            className="rounded-lg border border-primary/20 dark:border-gray-700 shadow"
           >
             <source src="https://cdn.chisadin.site/locketdio.mp4" type="video/mp4" />
             Trình duyệt của bạn không hỗ trợ phát video.
@@ -98,14 +98,14 @@ const Tutorial: React.FC = () => {
           <div className="flex items-center justify-center space-x-4 text-xs">
             <Link 
               to="/" 
-              className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors"
+              className="hover:text-primary dark:hover:text-primary transition-colors"
             >
               Trang chủ
             </Link>
             <span>•</span>
             <Link 
               to="/contact" 
-              className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors"
+              className="hover:text-primary dark:hover:text-primary transition-colors"
             >
               Liên hệ
             </Link>

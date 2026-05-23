@@ -5,13 +5,13 @@ import { Button } from '@/components/ui/button';
 
 const PrivacyPolicy: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/5 to-indigo-50 dark:from-gray-900 dark:via-accent/10 dark:to-indigo-900">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <Shield className="w-12 h-12 text-pink-500 mr-3" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+            <Shield className="w-12 h-12 text-primary mr-3" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Chính Sách Bảo Mật
             </h1>
           </div>
@@ -36,7 +36,7 @@ const PrivacyPolicy: React.FC = () => {
           {/* Introduction */}
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-              <FileText className="w-6 h-6 mr-2 text-pink-500" />
+              <FileText className="w-6 h-6 mr-2 text-primary" />
               Giới Thiệu
             </h2>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
@@ -49,7 +49,7 @@ const PrivacyPolicy: React.FC = () => {
           {/* Information Collection */}
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-              <Database className="w-6 h-6 mr-2 text-pink-500" />
+              <Database className="w-6 h-6 mr-2 text-primary" />
               Thông Tin Chúng Tôi Thu Thập
             </h2>
             <div className="space-y-4">
@@ -75,7 +75,7 @@ const PrivacyPolicy: React.FC = () => {
           {/* How We Use Information */}
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-              <Eye className="w-6 h-6 mr-2 text-pink-500" />
+              <Eye className="w-6 h-6 mr-2 text-primary" />
               Cách Chúng Tôi Sử Dụng Thông Tin
             </h2>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
@@ -93,7 +93,7 @@ const PrivacyPolicy: React.FC = () => {
           {/* Information Sharing */}
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-              <Users className="w-6 h-6 mr-2 text-pink-500" />
+              <Users className="w-6 h-6 mr-2 text-primary" />
               Chia Sẻ Thông Tin
             </h2>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
@@ -105,7 +105,7 @@ const PrivacyPolicy: React.FC = () => {
           {/* Data Security */}
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-              <Lock className="w-6 h-6 mr-2 text-pink-500" />
+              <Lock className="w-6 h-6 mr-2 text-primary" />
               Bảo Mật Dữ Liệu
             </h2>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
@@ -163,14 +163,14 @@ const PrivacyPolicy: React.FC = () => {
               <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm text-gray-500 dark:text-gray-400">
                 <Link 
                   to="/" 
-                  className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors"
+                  className="hover:text-primary dark:hover:text-primary transition-colors"
                 >
                   Trang chủ
                 </Link>
                 <span className="hidden sm:inline">•</span>
                 <Link 
                   to="/contact" 
-                  className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors"
+                  className="hover:text-primary dark:hover:text-primary transition-colors"
                 >
                   Liên hệ
                 </Link>

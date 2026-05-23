@@ -193,7 +193,7 @@ const CaptionBuilder: React.FC = () => {
     <div className="max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
 
       <div className="mb-4 sm:mb-6 md:mb-8">
-        <h1 className="text-2xl sm:text-3xl font-bold dark:text-white to-purple-600 mb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold dark:text-white text-accent mb-2">
           Caption Studio
         </h1>
         <p className="text-sm sm:text-base dark:text-gray-300">
@@ -357,7 +357,7 @@ const CaptionBuilder: React.FC = () => {
             <button
               onClick={handleSaveCaption}
               disabled={Boolean(!user || !user.is_verified || isSubmitting || remainingCaptionQuota <= 0 || (iconFile && remainingIconQuota <= 0))}
-              className="flex-1 flex items-center justify-center gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg sm:rounded-xl font-semibold hover:from-pink-600 hover:to-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+              className="flex-1 flex items-center justify-center gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-primary to-accent text-white rounded-lg sm:rounded-xl font-semibold hover:from-primary/90 hover:to-accent/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
               >
               {!user?.is_verified ? (
                 <>

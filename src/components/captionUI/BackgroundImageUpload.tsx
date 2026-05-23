@@ -189,7 +189,7 @@ export const BackgroundImageUpload: React.FC<BackgroundImageUploadProps> = React
     };
 
     return (
-      <div className="p-[2px] rounded-xl sm:rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
+      <div className="p-[2px] rounded-xl sm:rounded-2xl bg-gradient-to-r from-blue-500 via-accent to-primary">
         <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-blue-200 dark:border-gray-600">
           <div className="flex items-center gap-2 mb-3">
             <ImageIcon className="text-blue-500 dark:text-blue-400" size={18} />

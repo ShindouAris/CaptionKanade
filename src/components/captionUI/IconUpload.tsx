@@ -143,10 +143,10 @@ export const IconUpload: React.FC<IconUploadProps> = React.memo(
     }, [previewUrl]);
 
     return (
-      <div className="p-[2px] rounded-xl sm:rounded-2xl bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500">
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-pink-200 dark:border-gray-600">
+      <div className="p-[2px] rounded-xl sm:rounded-2xl bg-gradient-to-r from-primary to-accent">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-primary/20 dark:border-gray-600">
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
-            <ImageIcon className="text-pink-600 dark:text-pink-400" size={18} />
+            <ImageIcon className="text-primary dark:text-primary" size={18} />
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Icon Caption</h3>
             <Crown className="text-yellow-500" size={14} />
           </div>
@@ -156,7 +156,7 @@ export const IconUpload: React.FC<IconUploadProps> = React.memo(
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                 aria-label="Upload icon"
               >
                 <Upload size={16} />

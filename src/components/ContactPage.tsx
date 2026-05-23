@@ -9,11 +9,11 @@ const ContactPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/5 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-4">
+          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-indigo-600 bg-clip-text text-transparent mb-4">
             Liên Hệ Với Chúng Tôi
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
@@ -23,9 +23,9 @@ const ContactPage: React.FC = () => {
 
         <div className="grid lg:grid-cols-2 gap-8 mb-12">
           {/* Admin Card */}
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-pink-200 dark:border-gray-600">
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary/20 dark:border-gray-600">
             <div className="text-center mb-6">
-              <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center">
+              <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-r from-primary to-accent flex items-center justify-center">
                 <img src="/admin.jfif" alt="Admin" className="w-full h-full object-cover rounded-full" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Admin</h2>
@@ -33,8 +33,8 @@ const ContactPage: React.FC = () => {
             </div>
             
             <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-pink-50 dark:bg-gray-700">
-                <Mail className="text-pink-600 dark:text-pink-400" size={20} />
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 dark:bg-gray-700">
+                <Mail className="text-primary dark:text-primary" size={20} />
                 <div>
                   <p className="font-medium text-gray-900 dark:text-white">Email</p>
                   <p className="text-gray-600 dark:text-gray-300">kadintran010@gmail.com</p>
@@ -62,7 +62,7 @@ const ContactPage: React.FC = () => {
           </div>
 
           {/* Discord & Email Card */}
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-pink-200 dark:border-gray-600">
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary/20 dark:border-gray-600">
             <div className="text-center mb-6">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center">
                 <MessageCircle className="text-white" size={24} />
@@ -118,16 +118,16 @@ const ContactPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-pink-200 dark:border-gray-600">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary/20 dark:border-gray-600">
           <div className="text-center mb-6">
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Ủng hộ dự án này :D</h3>
             <p className="text-gray-600 dark:text-gray-300">Dự án này được đóng góp bởi cộng đồng để hoạt động, không có các bạn thì web không thể tồn tại.</p>
           </div>
           <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-6 mb-10 relative mx-auto">
-            <h2 className="text-2xl font-semibold mb-6 text-center text-pink-600">Hỗ trợ dự án này</h2>
+            <h2 className="text-2xl font-semibold mb-6 text-center text-primary">Hỗ trợ dự án này</h2>
             <div className="flex flex-col md:flex-row gap-6 items-center justify-center">
               <div className="w-full md:w-1/3 flex flex-col items-center">
-          <div className="bg-pink-100 p-4 rounded-lg w-64 h-64 flex items-center justify-center">
+          <div className="bg-primary/10 p-4 rounded-lg w-64 h-64 flex items-center justify-center">
             <img
               src="/banking_infor.png"
               alt="Donation QR Code"
@@ -140,15 +140,15 @@ const ContactPage: React.FC = () => {
           <h3 className="text-xl font-semibold mb-4">Thông tin</h3>
           <div className="space-y-4 w-full max-w-sm">
             <div>
-              <p className="font-medium text-pink-600">Tài khoản ngân hàng:</p>
+              <p className="font-medium text-primary">Tài khoản ngân hàng:</p>
               <p className="text-gray-600">{bankinfor.BankAccount}</p>
             </div>
             <div>
-              <p className="font-medium text-pink-600">Tên tài khoản:</p>
+              <p className="font-medium text-primary">Tên tài khoản:</p>
               <p className="text-gray-600">{bankinfor.BankAccountName}</p>
             </div>
             <div>
-              <p className="font-medium text-pink-600">Tên ngân hàng:</p>
+              <p className="font-medium text-primary">Tên ngân hàng:</p>
               <p className="text-gray-600">{bankinfor.BankName}</p>
             </div>
             <div>
@@ -177,23 +177,23 @@ const ContactPage: React.FC = () => {
         </div>
 
         {/* Additional Info */}
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-pink-200 dark:border-gray-600 mt-4">
+        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-primary/20 dark:border-gray-600 mt-4">
           <div className="text-center mb-6">
             <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Thông Tin Khác</h3>
             <p className="text-gray-600 dark:text-gray-300">Các thông tin khác của chúng tôi</p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="text-center p-4 rounded-lg bg-pink-50 dark:bg-gray-700">
-                <MapPin className="w-12 h-12 mx-auto mb-3 text-pink-600 dark:text-pink-400" />
+            <div className="text-center p-4 rounded-lg bg-primary/5 dark:bg-gray-700">
+                <MapPin className="w-12 h-12 mx-auto mb-3 text-primary dark:text-primary" />
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Địa chỉ</h4>
                 <p className="text-gray-600 dark:text-gray-300">
                     Trên mạng
                 </p>
             </div>
             
-            <div className="text-center p-4 rounded-lg bg-purple-50 dark:bg-gray-700">
-              <Clock className="w-12 h-12 mx-auto mb-3 text-purple-600 dark:text-purple-400" />
+            <div className="text-center p-4 rounded-lg bg-accent/5 dark:bg-gray-700">
+              <Clock className="w-12 h-12 mx-auto mb-3 text-accent dark:text-accent" />
               <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Giờ làm việc</h4>
               <p className="text-gray-600 dark:text-gray-300">
                 Thứ 2 - Thứ 6: 8:00 - 23:00<br />

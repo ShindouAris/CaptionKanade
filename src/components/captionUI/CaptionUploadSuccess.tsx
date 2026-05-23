@@ -69,7 +69,7 @@ export const CaptionUploadSuccess: React.FC<CaptionUploadSuccessProps> = ({ open
               </div>
 
               <div className="mt-3 flex items-center justify-between text-xs text-gray-600 dark:text-gray-300">
-                <button onClick={handleCopyId} className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition border border-pink-300">
+                <button onClick={handleCopyId} className="px-2 py-1 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition border border-primary/30">
                   ID: {caption.id}
                 </button>
                 <span>{new Date(caption.created_at).toLocaleDateString('vi-VN')}</span>

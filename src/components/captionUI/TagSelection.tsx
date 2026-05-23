@@ -20,9 +20,9 @@ export const TagsSection = React.memo(({
   };
 
   return (
-    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-pink-200 dark:border-gray-600">
+    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-primary/20 dark:border-gray-600">
       <div className="flex items-center gap-2 mb-3 sm:mb-4">
-        <Hash className="text-pink-600 dark:text-pink-400" size={18} />
+        <Hash className="text-primary dark:text-primary" size={18} />
         <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
           Tags
         </h3>
@@ -34,11 +34,11 @@ export const TagsSection = React.memo(({
           onChange={(e) => setTagInput(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
           placeholder="Thêm tag..."
-          className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm sm:text-base"
+          className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 text-sm sm:text-base"
         />
         <button
           onClick={handleAddTag}
-          className="px-3 sm:px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors text-sm sm:text-base"
+          className="px-3 sm:px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm sm:text-base"
         >
           Thêm
         </button>
@@ -48,12 +48,12 @@ export const TagsSection = React.memo(({
         {tags.map(tag => (
           <span
             key={tag}
-            className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300 rounded-full text-xs sm:text-sm"
+            className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 bg-primary/10 dark:bg-primary/30 text-primary dark:text-primary rounded-full text-xs sm:text-sm"
           >
             {tag}
             <button
               onClick={() => onRemoveTag(tag)}
-              className="hover:text-pink-900 dark:hover:text-pink-100"
+              className="hover:text-primary/90 dark:hover:text-primary/80"
             >
               <X size={12} />
             </button>

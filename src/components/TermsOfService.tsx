@@ -5,13 +5,13 @@ import { Button } from '@/components/ui/button';
 
 const TermsOfService: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/5 to-indigo-50 dark:from-gray-900 dark:via-accent/10 dark:to-indigo-900">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <Scale className="w-12 h-12 text-pink-500 mr-3" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
+            <Scale className="w-12 h-12 text-primary mr-3" />
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Điều Khoản Dịch Vụ
             </h1>
           </div>
@@ -36,7 +36,7 @@ const TermsOfService: React.FC = () => {
           {/* Introduction */}
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-              <FileText className="w-6 h-6 mr-2 text-pink-500" />
+              <FileText className="w-6 h-6 mr-2 text-primary" />
               Giới Thiệu
             </h2>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
@@ -75,7 +75,7 @@ const TermsOfService: React.FC = () => {
           {/* User Accounts */}
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-              <Users className="w-6 h-6 mr-2 text-pink-500" />
+              <Users className="w-6 h-6 mr-2 text-primary" />
               Tài Khoản Người Dùng
             </h2>
             <div className="space-y-4">
@@ -94,7 +94,7 @@ const TermsOfService: React.FC = () => {
           {/* Acceptable Use */}
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4 flex items-center">
-              <Shield className="w-6 h-6 mr-2 text-pink-500" />
+              <Shield className="w-6 h-6 mr-2 text-primary" />
               Sử Dụng Hợp Lệ
             </h2>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
@@ -156,7 +156,7 @@ const TermsOfService: React.FC = () => {
             <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mb-4">Quyền Riêng Tư</h2>
             <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
               Việc sử dụng Dịch vụ của bạn cũng tuân theo Chính sách Bảo mật của chúng tôi. 
-              Vui lòng xem <Link to="/privacy" className="text-pink-500 hover:text-pink-600 underline">Chính sách Bảo mật</Link> để hiểu cách chúng tôi thu thập và sử dụng thông tin.
+              Vui lòng xem <Link to="/privacy" className="text-primary hover:text-primary/90 underline">Chính sách Bảo mật</Link> để hiểu cách chúng tôi thu thập và sử dụng thông tin.
             </p>
           </section>
 
@@ -232,14 +232,14 @@ const TermsOfService: React.FC = () => {
               <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm text-gray-500 dark:text-gray-400">
                 <Link 
                   to="/" 
-                  className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors"
+                  className="hover:text-primary dark:hover:text-primary transition-colors"
                 >
                   Trang chủ
                 </Link>
                 <span className="hidden sm:inline">•</span>
                 <Link 
                   to="/contact" 
-                  className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors"
+                  className="hover:text-primary dark:hover:text-primary transition-colors"
                 >
                   Liên hệ
                 </Link>

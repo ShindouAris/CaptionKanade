@@ -41,11 +41,11 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 px-4">
-      <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-pink-100 dark:border-gray-700">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-accent/5 to-indigo-50 dark:from-gray-900 dark:via-accent/10 dark:to-indigo-900 px-4">
+      <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-primary/10 dark:border-gray-700">
         <div>
           <img src="/avatar.png" alt="Logo" className="w-20 h-20 mx-auto rounded-full" />
-          <h2 className="text-3xl font-bold text-center bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent mb-2">
+          <h2 className="text-3xl font-bold text-center bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
             Chào mừng trở lại
           </h2>
           <p className="text-center text-gray-600 dark:text-gray-300">
@@ -70,7 +70,7 @@ const Login: React.FC = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:placeholder-gray-400"
+                  className="appearance-none relative block w-full px-3 py-2 pl-10 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:placeholder-gray-400"
                   placeholder="Nhập email của bạn"
                 />
               </div>
@@ -88,7 +88,7 @@ const Login: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none relative block w-full px-3 py-2 pl-10 pr-10 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 dark:bg-gray-700 dark:placeholder-gray-400"
+                  className="appearance-none relative block w-full px-3 py-2 pl-10 pr-10 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary dark:bg-gray-700 dark:placeholder-gray-400"
                   placeholder="Nhập mật khẩu"
                 />
                 <button
@@ -116,7 +116,7 @@ const Login: React.FC = () => {
             <div className="text-sm">
               <Link 
                 to="/register" 
-                className="font-medium text-pink-600 hover:text-pink-500 dark:text-pink-400 dark:hover:text-pink-300"
+                className="font-medium text-primary hover:text-primary dark:text-primary dark:hover:text-primary"
               >
                 Chưa có tài khoản?
               </Link>
@@ -124,7 +124,7 @@ const Login: React.FC = () => {
             <div className="text-sm">
               <Link 
                 to="/reset-password" 
-                className="font-medium text-pink-600 hover:text-pink-500 dark:text-pink-400 dark:hover:text-pink-300"
+                className="font-medium text-primary hover:text-primary dark:text-primary dark:hover:text-primary"
               >
                 Quên mật khẩu?
               </Link>
@@ -134,7 +134,7 @@ const Login: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading || isGoogleLoading}
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
           >
             {isLoading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -159,21 +159,21 @@ const Login: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-6 text-sm text-gray-500 dark:text-gray-400">
             <Link 
               to="/privacy" 
-              className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors"
+              className="hover:text-primary dark:hover:text-primary transition-colors"
             >
               Chính sách bảo mật
             </Link>
             <span className="hidden sm:inline">•</span>
             <Link 
               to="/terms" 
-              className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors"
+              className="hover:text-primary dark:hover:text-primary transition-colors"
             >
               Điều khoản dịch vụ
             </Link>
             <span className="hidden sm:inline">•</span>
             <Link 
               to="/contact" 
-              className="hover:text-pink-500 dark:hover:text-pink-400 transition-colors"
+              className="hover:text-primary dark:hover:text-primary transition-colors"
             >
               Liên hệ
             </Link>

@@ -187,7 +187,7 @@ const UserFavorited: React.FC = () => {
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden mt-2 backdrop:blur-0">
       <div className="pt-16 pb-8 px-8 items-center text-center">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-pink-200 via-sky-300 to-green-200 bg-clip-text text-transparent mb-2">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-primary/20 via-sky-300 to-green-200 bg-clip-text text-transparent mb-2">
             Những thứ bạn đã yêu thích
           </h2>
         </div>

@@ -139,8 +139,8 @@ const EmailVerification: React.FC = () => {
   // Success screen
   if (isVerified) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 px-4">
-        <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-pink-100 dark:border-gray-700 text-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-accent/5 to-indigo-50 dark:from-gray-900 dark:via-accent/10 dark:to-indigo-900 px-4">
+        <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-primary/10 dark:border-gray-700 text-center">
           <CheckCircle2 className="mx-auto h-16 w-16 text-green-500" />
           <h2 className="mt-6 text-3xl font-bold text-gray-900 dark:text-white">
             Tài khoản đã xác thực!
@@ -152,7 +152,7 @@ const EmailVerification: React.FC = () => {
             Đang chuyển đến màn hình login...
           </p>
           <div className="mt-4">
-            <Loader2 className="mx-auto h-6 w-6 animate-spin text-pink-500" />
+            <Loader2 className="mx-auto h-6 w-6 animate-spin text-primary" />
           </div>
         </div>
       </div>
@@ -160,12 +160,12 @@ const EmailVerification: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 dark:from-gray-900 dark:via-purple-900 dark:to-indigo-900 px-4">
-      <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-pink-100 dark:border-gray-700">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-accent/5 to-indigo-50 dark:from-gray-900 dark:via-accent/10 dark:to-indigo-900 px-4">
+      <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-primary/10 dark:border-gray-700">
         {/* Header */}
         <div className="text-center">
-          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-pink-100 dark:bg-pink-900">
-            <Mail className="h-8 w-8 text-pink-600 dark:text-pink-300" />
+          <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-primary/10 dark:bg-primary/20">
+            <Mail className="h-8 w-8 text-primary dark:text-primary" />
           </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900 dark:text-white">
             Xác thực tài khoản
@@ -174,7 +174,7 @@ const EmailVerification: React.FC = () => {
             {email ? (
               <>
                 Bọn tui đã gửi mã đến email{' '}
-                <span className="font-medium text-pink-600 dark:text-pink-400">
+                <span className="font-medium text-primary dark:text-primary">
                   {email}
                 </span>
               </>
@@ -234,7 +234,7 @@ const EmailVerification: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading || isResending || !token || !verificationCode.trim()}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isLoading ? (
                 <>
@@ -251,7 +251,7 @@ const EmailVerification: React.FC = () => {
                 type="button"
                 onClick={handleResendCode}
                 disabled={isLoading || isResending || !token || user?.is_verified}
-                className="text-sm font-medium text-pink-600 hover:text-pink-500 dark:text-pink-400 dark:hover:text-pink-300 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center transition-colors"
+                className="text-sm font-medium text-primary hover:text-primary dark:text-primary dark:hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center transition-colors"
               >
                 {isResending ? (
                   <>

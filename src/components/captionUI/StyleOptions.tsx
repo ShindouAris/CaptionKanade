@@ -119,15 +119,15 @@ export const StyleOptions = React.memo(({
   onColorChange: (color: string) => void;
   onColorsChange: (colors: string[]) => void;
 }) => (
-  <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-pink-200 dark:border-gray-600">
+  <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-primary/20 dark:border-gray-600">
     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2 mb-4">
       <div className="flex items-center gap-2">
-        <Palette className="text-pink-600 dark:text-pink-400" size={18} />
+        <Palette className="text-primary dark:text-primary" size={18} />
         <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
           Tùy chỉnh giao diện
         </h3>
       </div>
-      <Button className="bg-gradient-to-br from-pink-200 to-blue-300 text-black font-comic text-xs sm:text-sm px-3 sm:px-4 py-2" onClick={() => {
+      <Button className="bg-gradient-to-br from-primary/20 to-blue-300 text-black font-comic text-xs sm:text-sm px-3 sm:px-4 py-2" onClick={() => {
           const newPalette = generateGradients(1)[0]
           onColorsChange(newPalette.colors)
           onColorChange(newPalette.color)

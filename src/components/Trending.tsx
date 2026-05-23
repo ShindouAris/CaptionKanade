@@ -54,7 +54,7 @@ const Trending: React.FC = () => {
           <div className="text-6xl mb-4">⚠️</div>
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">Đã xảy ra lỗi</h3>
           <p className="text-gray-600 dark:text-gray-300 mb-6">{error}</p>
-          <button onClick={() => fetchTrending(true)} className="px-6 py-3 bg-pink-500 text-white rounded-xl font-semibold hover:bg-pink-600 transition-all">Thử lại</button>
+          <button onClick={() => fetchTrending(true)} className="px-6 py-3 bg-primary text-white rounded-xl font-semibold hover:bg-primary/90 transition-all">Thử lại</button>
         </div>
       )}
 
@@ -84,7 +84,7 @@ const Trending: React.FC = () => {
               <button
                 onClick={() => fetchTrending(false)}
                 disabled={isLoading}
-                className="px-6 py-3 bg-pink-500 text-white rounded-xl hover:bg-pink-600 transition-colors disabled:opacity-50"
+                className="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50"
               >
                 {isLoading ? 'Đang tải...' : 'Tải thêm'}
               </button>

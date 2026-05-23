@@ -13,7 +13,7 @@ export const UserTabs: React.FC<Tabs> = ({ tab, setTab }) => {
           onClick={() => setTab("posted")}
           className={`px-4 py-2 font-semibold text-sm duration-200 ${
             tab === "posted"
-              ? "bg-gradient-to-r to-pink-200 via-sky-300 from-yellow-200 text-black"
+              ? "bg-gradient-to-r to-primary/20 via-sky-300 from-yellow-200 text-black"
               : "bg-white text-gray-700"
           }`}
         >
@@ -23,7 +23,7 @@ export const UserTabs: React.FC<Tabs> = ({ tab, setTab }) => {
           onClick={() => setTab("favorite")}
           className={`px-4 py-2 font-semibold text-sm duration-200 ${
             tab === "favorite"
-              ? "bg-gradient-to-r from-pink-200 via-sky-300 to-yellow-200 text-black"
+              ? "bg-gradient-to-r from-primary/20 via-sky-300 to-yellow-200 text-black"
               : "bg-white text-gray-700"
           }`}
         >
