@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Crown, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { IoPaperPlane } from "react-icons/io5";
 import { MdNearMeDisabled } from "react-icons/md";
 import { useCaptions } from '../contexts/CaptionContext';
@@ -286,21 +286,18 @@ const CaptionBuilder: React.FC = () => {
             )}
           </div>
 
-          {/* WIP Background Image Upload [disabled for everyone except admin] */}
-          {captionUser.isMember && (
-            <BackgroundImageUpload
-              bgFile={bgFile}
-              bgPreview={bgPreview}
-              bgLink={bgLink}
-              isUploading={isUploading}
-              onUploadFile={handleBgFileUpload}
-              onUploadLink={handleBgLinkUpload}
-              onRemove={handleBgRemove}
-              remainingQuota={remainingIconQuota}
-              mode={bgUploadMode}
-              onModeChange={setBgUploadMode}
-            />
-          )}
+          <BackgroundImageUpload
+            bgFile={bgFile}
+            bgPreview={bgPreview}
+            bgLink={bgLink}
+            isUploading={isUploading}
+            onUploadFile={handleBgFileUpload}
+            onUploadLink={handleBgLinkUpload}
+            onRemove={handleBgRemove}
+            remainingQuota={remainingIconQuota}
+            mode={bgUploadMode}
+            onModeChange={setBgUploadMode}
+          />
 
           <StyleOptions
             selectedColor={selectedColor}
