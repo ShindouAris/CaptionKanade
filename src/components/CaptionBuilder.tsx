@@ -302,21 +302,6 @@ const CaptionBuilder: React.FC = () => {
             />
           )}
 
-          {/* Non-member notice */}
-          {captionUser.isMember && (
-            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-yellow-200 dark:border-yellow-700">
-              <div className="flex items-center gap-2 mb-2">
-                <Crown className="text-yellow-500" size={18} />
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-                  Đang bảo trì 
-                </h3>
-              </div>
-              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-4">
-                Icon upload đang bảo trì, hãy dùng url upload nhé.
-              </p>
-            </div>
-          )}
-
           <StyleOptions
             selectedColor={selectedColor}
             selectedColors={selectedColors}
