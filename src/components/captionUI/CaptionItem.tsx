@@ -7,8 +7,10 @@ import { Badge } from "../ui/badge";
 import { Caption } from "@/types/Caption";
 import {User} from "@/contexts/AuthContext"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Separator } from "../ui/separator";
 import toast from "react-hot-toast";
 import { getCaptionGradient } from "@/lib/captionColors";
+import { CommentSection } from "./CommentSection";
 
 interface CaptionProps {
   caption: Caption;
@@ -222,14 +224,14 @@ export const CaptionItem: React.FC<CaptionProps> = ({
       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-3xl" />
     </div>
     <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-4xl p-0 overflow-hidden">
-          <DialogHeader className="p-6 border-b">
-            <DialogTitle className="text-lg font-bold">{caption.text || 'Caption Kanade'}</DialogTitle>
+        <DialogContent className="max-w-4xl max-h-[90vh] p-0 overflow-hidden flex flex-col">
+          <DialogHeader className="shrink-0 p-6 border-b">
+            <DialogTitle className="text-lg font-bold truncate pr-8">{caption.text || 'Caption Kanade'}</DialogTitle>
           </DialogHeader>
-          <div className="p-6 space-y-4">
+          <div className="flex-1 min-h-0 overflow-y-auto p-6 space-y-4">
             {/* Preview lớn */}
             <div
-              className="w-full h-64 rounded-3xl flex items-center justify-center"
+              className="w-full h-64 shrink-0 rounded-3xl flex items-center justify-center"
             >
               <div 
                 className="
@@ -295,6 +297,10 @@ export const CaptionItem: React.FC<CaptionProps> = ({
                 ))}
               </div>
             )}
+
+            <Separator className="my-4" />
+
+            <CommentSection captionId={caption.id} />
           </div>
         </DialogContent>
       </Dialog>
