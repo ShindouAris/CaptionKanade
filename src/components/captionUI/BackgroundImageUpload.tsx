@@ -252,7 +252,7 @@ export const BackgroundImageUpload: React.FC<BackgroundImageUploadProps> = React
                 </p>
               )}
               <div className="text-xs text-gray-500 dark:text-gray-400">
-                • Chỉ JPG, JPEG, PNG, GIF — tối đa 1MB<br />
+                • Chỉ chấp nhận JPG, JPEG, PNG, GIF — tối đa 1MB<br />
                 • Ảnh tĩnh sẽ được cắt theo tỷ lệ 16:9 trước khi tải lên<br />
                 • GIF sẽ được tải lên trực tiếp (không cắt) để giữ animation
               </div>
@@ -293,7 +293,7 @@ export const BackgroundImageUpload: React.FC<BackgroundImageUploadProps> = React
                 Áp dụng
               </button>
               <div className="text-xs text-gray-500 dark:text-gray-400">
-                • Chỉ link ảnh trực tiếp (.jpg, .jpeg, .png, .gif)<br />
+                • Chỉ link ảnh trực tiếp và có các đuôi (.jpg, .jpeg, .png, .gif)<br />
                 • Link phải sống liên tục để ảnh hiển thị
               </div>
             </div>
