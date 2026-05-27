@@ -11,9 +11,9 @@ import {
   DrawerFooter,
 } from "@/components/ui/drawer";
 
-const MAX_BG_SIZE = 1 * 1024 * 1024; // 1MB
-const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
-const ALLOWED_EXTS = [".jpg", ".jpeg", ".png", ".gif"];
+const MAX_BG_SIZE = 3 * 1024 * 1024; // 3MB
+const ALLOWED_TYPES = ["image/png", "image/gif"];
+const ALLOWED_EXTS = [".png", ".gif"];
 const CROP_ASPECT = 16 / 9;
 
 export interface BackgroundImageUploadProps {
@@ -82,7 +82,7 @@ export const BackgroundImageUpload: React.FC<BackgroundImageUploadProps> = React
       try {
         if (!isValidImageUrl(url)) {
           setIsValidUrl(false);
-          setUrlError("URL phải là link ảnh trực tiếp (.jpg, .jpeg, .png, .gif)");
+          setUrlError("URL phải là link ảnh trực tiếp (.png, .gif)");
           return;
         }
         const ok = await canLoadImage(url);
@@ -127,11 +127,11 @@ export const BackgroundImageUpload: React.FC<BackgroundImageUploadProps> = React
       setFileError("");
 
       if (!ALLOWED_TYPES.includes(file.type)) {
-        setFileError("Chỉ chấp nhận file JPG, JPEG, PNG hoặc GIF");
+        setFileError("Chỉ chấp nhận file PNG hoặc GIF");
         return;
       }
       if (file.size > MAX_BG_SIZE) {
-        setFileError("File quá lớn. Tối đa 1MB");
+        setFileError("File quá lớn. Tối đa 3MB");
         return;
       }
 
@@ -172,7 +172,7 @@ export const BackgroundImageUpload: React.FC<BackgroundImageUploadProps> = React
       try {
         const blob = await getCroppedBlob(imageSrc, croppedAreaPixels);
         if (blob.size > MAX_BG_SIZE) {
-          setFileError("Ảnh sau khi cắt vẫn lớn hơn 1MB. Hãy chọn vùng nhỏ hơn hoặc dùng ảnh khác.");
+          setFileError("Ảnh sau khi cắt vẫn lớn hơn 3MB. Hãy chọn vùng nhỏ hơn hoặc dùng ảnh khác.");
           setIsProcessing(false);
           return;
         }
@@ -242,7 +242,7 @@ export const BackgroundImageUpload: React.FC<BackgroundImageUploadProps> = React
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".jpg,.jpeg,.png,.gif,image/jpeg,image/png,image/gif"
+                accept=".png,.gif,image/png,image/gif"
                 onChange={handleFileChange}
                 className="hidden"
               />
@@ -252,7 +252,7 @@ export const BackgroundImageUpload: React.FC<BackgroundImageUploadProps> = React
                 </p>
               )}
               <div className="text-xs text-gray-500 dark:text-gray-400">
-                • Chỉ chấp nhận JPG, JPEG, PNG, GIF — tối đa 1MB<br />
+                • Chỉ chấp nhận PNG, GIF — tối đa 3MB<br />
                 • Ảnh tĩnh sẽ được cắt theo tỷ lệ 16:9 trước khi tải lên<br />
                 • GIF sẽ được tải lên trực tiếp (không cắt) để giữ animation
               </div>
@@ -266,7 +266,7 @@ export const BackgroundImageUpload: React.FC<BackgroundImageUploadProps> = React
                   type="url"
                   value={urlInput}
                   onChange={handleUrlChange}
-                  placeholder="https://example.com/background.jpg"
+                  placeholder="https://example.com/background.png"
                   disabled={isUploading || isValidating}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm pr-9"
                 />
@@ -293,7 +293,7 @@ export const BackgroundImageUpload: React.FC<BackgroundImageUploadProps> = React
                 Áp dụng
               </button>
               <div className="text-xs text-gray-500 dark:text-gray-400">
-                • Chỉ link ảnh trực tiếp và có các đuôi (.jpg, .jpeg, .png, .gif)<br />
+                • Chỉ link ảnh trực tiếp và có các đuôi (.png, .gif)<br />
                 • Link phải sống liên tục để ảnh hiển thị
               </div>
             </div>
