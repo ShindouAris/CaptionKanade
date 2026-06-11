@@ -1,6 +1,7 @@
 import React from "react";
 import { Palette } from "lucide-react";
 import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 import toast from "react-hot-toast";
 import { MAX_CAPTION_COLORS, normalizeCaptionColors } from "@/lib/captionColors";
 
@@ -108,6 +109,16 @@ export const generateGradients = (count: number): PalettePreset[] => {
 
 
 
+const normalizeHex = (value: string): string | null => {
+  const cleaned = value.trim().replace(/\s/g, '');
+  if (!cleaned) return null;
+  const withHash = cleaned.startsWith('#') ? cleaned : `#${cleaned}`;
+  if (/^#[0-9A-Fa-f]{6}$/.test(withHash)) {
+    return withHash.toUpperCase();
+  }
+  return null;
+};
+
 export const StyleOptions = React.memo(({ 
   selectedColor,
   selectedColors,
@@ -118,89 +129,167 @@ export const StyleOptions = React.memo(({
   selectedColors: string[];
   onColorChange: (color: string) => void;
   onColorsChange: (colors: string[]) => void;
-}) => (
-  <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-primary/20 dark:border-gray-600">
-    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2 mb-4">
-      <div className="flex items-center gap-2">
-        <Palette className="text-primary dark:text-primary" size={18} />
-        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-          Tùy chỉnh giao diện
-        </h3>
-      </div>
-      <Button className="bg-gradient-to-br from-primary/20 to-blue-300 text-black font-comic text-xs sm:text-sm px-3 sm:px-4 py-2" onClick={() => {
-          const newPalette = generateGradients(1)[0]
-          onColorsChange(newPalette.colors)
-          onColorChange(newPalette.color)
-        toast.success(`Đã tạo một palette mới - ${newPalette.name}!`)
-      }}>
-        <span className="hidden sm:inline">Random một màu mới</span>
-        <span className="sm:hidden">Random màu</span>
-      </Button>
-    </div>
-    
-    <div className="space-y-3 sm:space-y-4">
-      <div>
-        <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          Màu chữ
-        </label>
-        <input
-          type="color"
-          value={selectedColor}
-          onChange={(e) => onColorChange(e.target.value)}
-          className="w-full h-8 sm:h-10 rounded-lg border border-gray-300 dark:border-gray-600 cursor-pointer"
-        />
-      </div>
+}) => {
+  const [textHexInput, setTextHexInput] = React.useState(selectedColor);
+  const [gradientHexInputs, setGradientHexInputs] = React.useState<string[]>(selectedColors);
 
-      <div>
-        <div className="flex items-center justify-between gap-2 mb-2">
-          <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
-            Palette màu ({selectedColors.length}/{MAX_CAPTION_COLORS})
+  React.useEffect(() => {
+    setTextHexInput(selectedColor);
+  }, [selectedColor]);
+
+  React.useEffect(() => {
+    setGradientHexInputs(selectedColors);
+  }, [selectedColors]);
+
+  const handleTextHexBlur = () => {
+    const normalized = normalizeHex(textHexInput);
+    if (normalized) {
+      onColorChange(normalized);
+      setTextHexInput(normalized);
+    } else {
+      setTextHexInput(selectedColor);
+    }
+  };
+
+  const handleTextHexKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      (e.target as HTMLInputElement).blur();
+    }
+  };
+
+  const handleGradientHexBlur = (index: number) => {
+    const normalized = normalizeHex(gradientHexInputs[index]);
+    if (normalized) {
+      const nextColors = [...selectedColors];
+      nextColors[index] = normalized;
+      onColorsChange(normalizeCaptionColors(nextColors, selectedColors));
+    } else {
+      const nextInputs = [...gradientHexInputs];
+      nextInputs[index] = selectedColors[index];
+      setGradientHexInputs(nextInputs);
+    }
+  };
+
+  const handleGradientHexKeyDown = (e: React.KeyboardEvent, index: number) => {
+    if (e.key === 'Enter') {
+      (e.target as HTMLInputElement).blur();
+    }
+  };
+
+  return (
+    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-lg border border-primary/20 dark:border-gray-600">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <Palette className="text-primary dark:text-primary" size={18} />
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+            Tùy chỉnh giao diện
+          </h3>
+        </div>
+        <Button className="bg-gradient-to-br from-primary/20 to-blue-300 text-black font-comic text-xs sm:text-sm px-3 sm:px-4 py-2" onClick={() => {
+            const newPalette = generateGradients(1)[0]
+            onColorsChange(newPalette.colors)
+            onColorChange(newPalette.color)
+          toast.success(`Đã tạo một palette mới - ${newPalette.name}!`)
+        }}>
+          <span className="hidden sm:inline">Random một màu mới</span>
+          <span className="sm:hidden">Random màu</span>
+        </Button>
+      </div>
+      
+      <div className="space-y-3 sm:space-y-4">
+        <div>
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Màu chữ
           </label>
-          <Button
-            type="button"
-            variant="outline"
-            className="h-8 px-3 text-xs"
-            disabled={selectedColors.length >= MAX_CAPTION_COLORS}
-            onClick={() => onColorsChange([...selectedColors, selectedColors[selectedColors.length - 1] ?? '#FFFFFF'])}
-          >
-            Thêm màu
-          </Button>
+          <div className="flex items-center gap-2">
+            <input
+              type="color"
+              value={selectedColor}
+              onChange={(e) => {
+                onColorChange(e.target.value);
+                setTextHexInput(e.target.value.toUpperCase());
+              }}
+              className="w-12 h-8 sm:h-10 rounded-lg border border-gray-300 dark:border-gray-600 cursor-pointer"
+            />
+            <Input
+              value={textHexInput}
+              onChange={(e) => setTextHexInput(e.target.value.toUpperCase())}
+              onBlur={handleTextHexBlur}
+              onKeyDown={handleTextHexKeyDown}
+              placeholder="#HEX"
+              className="h-8 sm:h-10 font-mono text-xs sm:text-sm uppercase"
+            />
+          </div>
         </div>
 
-        <div className="space-y-2">
-          {selectedColors.map((color, index) => (
-            <div key={`${color}-${index}`} className="flex items-center gap-2">
-              <div className="flex-1">
-                <label className="block text-[11px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                  Màu {index + 1}
-                </label>
-                <input
-                  type="color"
-                  value={color}
-                  onChange={(e) => {
-                    const nextColors = [...selectedColors];
-                    nextColors[index] = e.target.value;
-                    onColorsChange(normalizeCaptionColors(nextColors, selectedColors));
+        <div>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+              Palette màu ({selectedColors.length}/{MAX_CAPTION_COLORS})
+            </label>
+            <Button
+              type="button"
+              variant="outline"
+              className="h-8 px-3 text-xs"
+              disabled={selectedColors.length >= MAX_CAPTION_COLORS}
+              onClick={() => onColorsChange([...selectedColors, selectedColors[selectedColors.length - 1] ?? '#FFFFFF'])}
+            >
+              Thêm màu
+            </Button>
+          </div>
+
+          <div className="space-y-2">
+            {selectedColors.map((color, index) => (
+              <div key={`gradient-color-${index}`} className="flex items-center gap-2">
+                <div className="flex-1">
+                  <label className="block text-[11px] sm:text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                    Màu {index + 1}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={color}
+                      onChange={(e) => {
+                        const nextColors = [...selectedColors];
+                        nextColors[index] = e.target.value;
+                        onColorsChange(normalizeCaptionColors(nextColors, selectedColors));
+                        const nextInputs = [...gradientHexInputs];
+                        nextInputs[index] = e.target.value.toUpperCase();
+                        setGradientHexInputs(nextInputs);
+                      }}
+                      className="w-12 h-8 sm:h-10 rounded-lg border border-gray-300 dark:border-gray-600 cursor-pointer"
+                    />
+                    <Input
+                      value={gradientHexInputs[index] ?? color}
+                      onChange={(e) => {
+                        const nextInputs = [...gradientHexInputs];
+                        nextInputs[index] = e.target.value.toUpperCase();
+                        setGradientHexInputs(nextInputs);
+                      }}
+                      onBlur={() => handleGradientHexBlur(index)}
+                      onKeyDown={(e) => handleGradientHexKeyDown(e, index)}
+                      placeholder="#HEX"
+                      className="h-8 sm:h-10 font-mono text-xs sm:text-sm uppercase"
+                    />
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="mt-5 h-8 px-3 text-xs text-red-600 hover:text-red-700"
+                  disabled={selectedColors.length <= 1}
+                  onClick={() => {
+                    if (selectedColors.length <= 1) return;
+                    onColorsChange(selectedColors.filter((_, currentIndex) => currentIndex !== index));
                   }}
-                  className="w-full h-8 sm:h-10 rounded-lg border border-gray-300 dark:border-gray-600 cursor-pointer"
-                />
+                >
+                  Xóa
+                </Button>
               </div>
-              <Button
-                type="button"
-                variant="ghost"
-                className="mt-5 h-8 px-3 text-xs text-red-600 hover:text-red-700"
-                disabled={selectedColors.length <= 1}
-                onClick={() => {
-                  if (selectedColors.length <= 1) return;
-                  onColorsChange(selectedColors.filter((_, currentIndex) => currentIndex !== index));
-                }}
-              >
-                Xóa
-              </Button>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-));
+  );
+});
