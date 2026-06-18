@@ -213,7 +213,7 @@ const CaptionBuilder: React.FC = () => {
           {/* Icon Upload - Only for Members */}
 
           <div className="space-y-3">
-            {/*<div className='font-bold text-black text-lg'>Tuỳ chọn tải lên icon caption</div>
+            <div className='font-bold text-black text-lg'>Tuỳ chọn tải lên icon caption</div>
             <Select
               value={uploadMode}
               onValueChange={(value) => setUploadMode(value as typeof uploadMode)}
@@ -283,7 +283,7 @@ const CaptionBuilder: React.FC = () => {
                 }}
                 remainingQuota={remainingIconQuota}
               />
-            )}*/}
+            )}
           </div>
 
           <BackgroundImageUpload
